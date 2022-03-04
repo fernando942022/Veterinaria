@@ -24,7 +24,7 @@
               <div class="row col-6 in">
 
                   <div class="col-7" id="summer">
-                      <!--@Html.TextAreaFor(model => model.MedicalChart, new { @class = "form-control", @placeholder = "Medical chart", @id = "summernote" })-->
+                      
                   </div><br />
               </div>    
 
@@ -74,7 +74,7 @@
         var namePet;
 
         $(document).ready(function () {
-            alert();
+            //alert();
 
             $("#summer").summernote({
                 placeholder: "Medical chart",
@@ -110,15 +110,14 @@
                 //alert($("#summer").summernote("code"));
 
                 $.ajax({
-                url: "@Url.Action("Index", "Consult")",
+                    url: "@Url.Action("Index", "Consult")",
                     data: dataConsult(),
                     type: "Post"
                 })
                 .done(function (data) {
                     alert(data);
                     //alert("OwnerId = " + ownerId + "PetId = " + petId);
-                    $("#ownername").val(nameOwner);
-                    $("#petname").val(namePet);
+                    
                 })
 
             });
@@ -186,6 +185,7 @@
                 PetTemperature: $("#pettemperature").val(),
                 MedicalChart: $("#summer").summernote("code")
             }
+            //console.log(data);
             return data;
         }
 

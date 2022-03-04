@@ -16,10 +16,6 @@ namespace Vet.Controllers
         {
             Dbcon = con;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
 
         [HttpPost]
         public IActionResult Index(Consult model)
