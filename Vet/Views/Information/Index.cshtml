@@ -1,0 +1,65 @@
+﻿@model List<Vet.Models.Pet>
+
+<h2>Customer</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Image</th>
+            <th>BirthDate</th>
+            <th>Age</th>
+            <th>Sex</th>
+            <th>Specie</th>
+            <th>Race</th>
+            <th>Color</th>
+            <th>Weigth</th>
+            <th>Comments</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var columnData in Model)
+        {
+            <tr>
+                <td>@columnData.Name</td>
+                <td>@columnData.Image</td>
+                <td>@columnData.BirthDate</td>
+                <td>@columnData.Age</td>
+                <td>@columnData.Sex</td>
+                <td>@columnData.Specie</td>
+                <td>@columnData.Race</td>
+                <td>@columnData.Color</td>
+                <td>@columnData.weight</td>
+                <td>@columnData.Comment</td>
+                <td>
+                    <button onclick="document.location.href = '@Url.Content("~/Pet/Edit/?id="+columnData.PetId+"="+columnData.OwnerId+"="+columnData.Name)'" class="btn btn-primary" id="edit">Edit</button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+<br />
+
+
+<!--<dt class="col-sm-2">
+    <label>hola</label>
+</dt>
+<dd class="col-sm-10">
+    <label>hola</label>
+</dd>
+
+<dt class="col-sm-2">
+    <label>hola</label>
+</dt>
+<dd class="col-sm-10">
+    <table class="table">
+        <tr>
+            <th>Course Title</th>
+            <th>Grade</th>
+        </tr>
+
+    </table>
+</dd>-->

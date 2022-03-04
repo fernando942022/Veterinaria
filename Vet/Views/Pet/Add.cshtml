@@ -1,0 +1,197 @@
+﻿@model Vet.Models.Pet
+
+@{
+    ViewData["Title"] = "Add Pet";
+}
+<div class="row">
+    <div class="col-4">
+        <img src="~/images/images.jpg" />
+    </div>
+    <div class="col-md-8" id="f2">
+        <h2>@ViewBag.Title</h2>
+
+        @using (Html.BeginForm("Add", "Pet", FormMethod.Post, new { role = "form", @class = "form-horizontal", @id = "f3" }))
+        {
+            <div class="form-row">
+                <div class="col-md-6 mb-3">
+                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", @placeholder = "Name", @id = "name", @required = "required" })
+                </div>
+                <br />
+                <div class="col-md-5 mb-3">
+
+                    <input type="text" class="form-control" id="image" placeholder="Image">
+
+                </div>
+                <br />
+
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(model => model.BirthDate)
+                    <div class="input-group">
+
+                        @Html.EditorFor(model => model.BirthDate, new { @class = "form-control", @placeholder = "Birthday", @id = "birthday" })
+                    </div>
+                </div>
+                <br />
+
+                <div class="col-md-2 mb-3">
+                    <input class="form-check-input" type="radio" name="sex" id="male" value="Male" checked, required="required">
+                    <label class="form-check-label" for="gridRadios1">
+                        Male
+                    </label>
+                    <br />
+
+                    <input class="form-check-input" type="radio" name="sex" id="female" value="Female" checked, required="required">
+                    <label class="form-check-label" for="gridRadios1">
+                        Female
+                    </label>
+                </div>
+
+                <br />
+                <div class="col-md-5 mb-3">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Age</div>
+                        </div>
+                        @Html.TextBoxFor(model => model.Age, new { @class = "form-control", @placeholder = "Age", @id = "age", @disabled = "disabled" })
+                    </div>
+                </div>
+
+                <br />
+
+                <div class="col-md-6 mb-3">
+                    @Html.TextBoxFor(model => model.Specie, new { @class = "form-control", @placeholder = "Specie", @id = "specie", @required = "required" })
+                </div>
+                <br />
+
+                <div class="col-md-5 mb-3">
+                    @Html.TextBoxFor(model => model.Race, new { @class = "form-control", @placeholder = "Race", @id = "race", @required = "required" })
+                </div>
+                <br />  <br /><br />
+
+                <div class="col-md-6 mb-3">
+                    @Html.TextBoxFor(model => model.Color, new { @class = "form-control", @placeholder = "Color", @id = "color", @required = "required" })
+                </div>
+                <br />
+
+                <div class="col-md-5 mb-3">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Kg</div>
+                        </div>
+                        @Html.TextBoxFor(model => model.weight, new { @class = "form-control", @placeholder = "Weight", @id = "weight", @required = "required" })
+                    </div>
+                </div>
+                <br /> <br /><br />
+
+                <div class="col-md-11 mb-3">
+                    @Html.TextAreaFor(model => model.Comment, new { @class = "form-control", @placeholder = "Other Comments", @id = "comment" })
+                </div>
+
+            </div>
+            <br /><div style="text-align:left" class="col-md-11 mb-3">
+                <input type="button" id="add" class="btn btn-primary" value="Add Pet" />
+            </div>
+        }
+
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () { 
+
+        $("#add").click(function () {
+
+            var id = $(location).attr('search').split("=");
+            var ownerId = parseInt(id[1]);
+            var data = getRecord(ownerId);
+          //alert(OwnerId+2);
+
+            $.ajax({
+                url: "@Url.Action("Add", "Pet")",
+                data: data,
+                type: "Post"
+            })
+            .done(function (result) {
+                //alert(result);
+                document.location.href = "@Url.Content("~/Home/Index")";
+            })
+        })
+
+        $("#weight").keypress(function (e){
+            if (e.keyCode < 48 || e.keyCode > 57)
+            {
+                alert("Enter only numeric characters");
+                return false;
+            }
+        })
+
+        $("#BirthDate").blur(function () {
+
+            // La funcion map convierte los elementos de un array a int cada elemento
+            var birthDay = $("#BirthDate").val().split("-").map((i) => Number(i));
+
+            // Objeto date obtiene la fecha actual
+            var currentDate = new Date();
+            var currentDay = currentDate.getDate();
+            var currentMonth = currentDate.getMonth() + 1;
+            var currentYear = currentDate.getFullYear();
+
+            if (birthDay[0] == currentYear)
+            {
+                if (birthDay[1] == currentMonth)
+                {
+                    if (birthDay[2] > currentDay) {
+                        alert("Incorrect day of birth");
+                    }
+                    else
+                    {
+                        $("#age").val(currentDay - birthDay[2] + " Days");
+                    }
+                }
+                else
+                {
+                    if (birthDay[1] > currentMonth) {
+                        alert("Incorrect month of birth");
+                    }
+                    else
+                    {
+                        $("#age").val(currentMonth - birthDay[1] + " Months");
+                    }
+                }
+            }
+            else
+            {
+                if (birthDay[0] > currentYear) {
+                    alert("Incorrect year of birth");
+                }
+                else
+                {
+                    $("#age").val(currentYear - birthDay[0] + " year");
+                }
+            }
+        })
+
+        function getRecord(ownerId)
+        {
+            var data = {
+                OwnerId: ownerId,
+                Name: $("#name").val(),
+                Image: $("#image").val(),
+                BirthDate: $("#BirthDate").val(),
+                Sex: $("input:radio[name=sex]:checked").val(),
+                Age: $("#age").val(),
+                Specie: $("#specie").val(),
+                Race: $("#race").val(),
+                Color: $("#color").val(),
+                Weight: $("#weight").val(),
+                Comment: $("#comment").val()
+            };
+
+            return data
+         }
+        });
+    </script>
+}
+

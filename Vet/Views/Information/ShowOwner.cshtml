@@ -1,0 +1,115 @@
+﻿@model List<Vet.Models.Owner>
+
+<h2>Owner</h2>
+
+<table class="col-md-10">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Home Address</th>
+            <th>Cellphone</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var columnData in Model)
+        {
+            <tr>
+                <td>@columnData.NameOwner</td>
+                <td>@columnData.HomeAddress</td>
+                <td>@columnData.Cellphone</td>
+                <td>
+                    <button onclick="showPet(@columnData.OwnerId);" class="btn btn-primary" id="myPet" name="@columnData.NameOwner">My pet</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary" id="edit" onclick="document.location.href = '@Url.Content("~/Owner/Add/?id="+columnData.OwnerId+"="+columnData.NameOwner)'">Edit</button>
+                </td>
+                <td>
+                    <button onclick="document.location.href = '@Url.Content("~/Pet/Add/?id="+columnData.OwnerId)'" class="btn btn-primary" id="newPet">New Pet</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+
+
+<div class="container">
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog" style="width:100%">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;" id="modalTitle">
+                    <button type="button" class="close" data-dismiss="modal" style="text-align:right">[X]</button>
+
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+
+                    <div class="col-12" id="pet">
+
+                    </div>
+                    <br /><button type="button" class="btn btn-primary" data-dismiss="modal" style="text-align:right">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script>
+
+        function showPet(ownerId) {
+
+            $.ajax({
+                url: "@Url.Action("MyPet", "Information")",
+                data: { ownerId },
+                type: "Post"
+            }).done(function (result) {
+                console.info(result);
+                //alert(result[0]["name"]);
+                $("#pet").html("");
+                $("#pet").append("<table class= 'table table-sm' id = 'tablePet'></table>");
+                var table = $("#tablePet");
+                table.append("<thead>< tr><th>Name</th><th>Image</th><th>BirthDate</th><th>Age</th><th>Sex</th><th>Specie</th><th>Race</th><th>Color</th><th>Weigth</th><th>Comments</th></tr></thead>");
+
+                $.each(result, function (index, row) {
+                    table.append("<tr>");
+                    table.append("<td style='text-align:center' onclick='edit(" + result[index]["petId"] + ");' >" + result[index]["name"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["image"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["birthDate"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["age"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["sex"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["specie"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["race"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["color"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["weight"] + "</td>");
+                    table.append("<td style='text-align:center'>" + result[index]["comment"] + "</td>");
+                    //$.each(row, function (key, value) {
+
+                  //if (key != "petId" && key != "ownerId" && key != "owner")
+                //{
+                  //table.append("<td style='text-align:center' >"+ value + "</td>");
+
+                //}
+                //});
+
+                table.append("</tr>");
+            });
+
+                $("#myModal").modal({ backdrop: false });
+            })
+        }
+
+        function edit(petId) {
+            document.location.href = "@Url.Content("~/Pet/Edit/?id=")" + petId;
+        }
+
+
+    </script>
+}

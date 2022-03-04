@@ -1,0 +1,108 @@
+﻿@model Vet.Models.Owner
+@{
+    ViewData["Title"] = "Add Owner";
+}
+
+
+
+<div class="row">
+
+    <div class="col-4">
+        <img src="~/images/images.jpg" />
+    </div><br />
+          <div class="col-md-4" id="f1" style="height:50%">
+              <h2>@ViewBag.Title</h2>
+
+                  @Html.TextBoxFor(model => model.NameOwner, new { @class = "form-control", @placeholder = "Name", @id = "name" })
+
+                  <br />@Html.TextBoxFor(model => model.HomeAddress, new { @class = "form-control", @placeholder = "Home Address", @id = "address" })
+
+                  <br />@Html.TextBoxFor(model => model.Cellphone, new { @class = "form-control", @placeholder = "Cellphone", @id = "cellphone" })
+
+                  <br /><div>
+                      <input type="button" id="add" class="btn btn-primary" value="Add Owner" />
+                  </div>
+          </div>
+</div>
+
+ @section scripts
+{
+     <script>
+         $(document).ready(function ()
+         {
+             var id = $(location).attr('search').split("=");
+             var OwnerId = parseInt(id[1]);
+
+             if (id.length > 2) {
+                 $("#name").val(id[2]);
+                 $("#add").val("Save");
+
+                 $.ajax({
+                     url: "@Url.Action("ShowOwner", "Information")",
+                     data: { OwnerId },
+                         type: "Post"
+                     }).done(function (result) {
+                         //alert(result);
+                         if (result != null)
+                         {
+                             $("#name").val(result[0]["nameOwner"]);
+                             $("#address").val(result[0]["homeAddress"]);
+                             $("#cellphone").val(result[0]["cellphone"]);
+                         }
+                         else
+                             alert("Operation Failed");
+                     })
+             }
+
+             $("#add").click(function () {
+                 if ($(this).val() == "Save") {
+                     alert();
+
+                     $.ajax({
+                         url: "@Url.Action("Edit", "Owner")",
+                         data: {
+                             OwnerId: OwnerId,
+                             NameOwner: $("#name").val(),
+                             HomeAddress: $("#address").val(),
+                             Cellphone: $("#cellphone").val()
+                         },
+                         type: "Post"
+                     }).done(function (result) {
+                         //alert(result);
+                         if (result != null)
+                             document.location.href = "@Url.Content("~/Information/ShowOwner")";
+                         else
+                             alert("Operation Failed");
+                     })
+                 }
+                 else
+                 {
+                     $.ajax({
+                         url: "@Url.Action("Add", "Owner")",
+                         data: {
+                             NameOwner: $("#name").val(),
+                             HomeAddress: $("#address").val(),
+                             Cellphone: $("#cellphone").val()
+                         },
+                         type: "Post"
+                     }).done(function (result) {
+                         //alert(result);
+                         var OwnerId = result;
+                         if (result != null)
+                             document.location.href = "@Url.Content("~/Pet/Add")" + "/?id=" + OwnerId;
+                         else
+                             alert("Operation Failed");
+                     })
+                 }
+            })
+
+            $("#cellphone").keypress(function (e) {
+                if (e.keyCode < 48 || e.keyCode > 57) {
+                    alert("Enter only numeric characters");
+                    return false;
+                }
+            })
+
+         });
+     </script>
+}

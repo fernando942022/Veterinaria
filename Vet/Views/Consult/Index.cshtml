@@ -1,0 +1,193 @@
+﻿@model Vet.Models.Consult
+    
+
+    <h3>Consult</h3>
+
+    <div class="col-12">
+        <div class="form-inline float-lg-right">
+            <input type="text" class="form-control" id="namePet" placeholder="Name Pet" required />
+            <button class="form-control btn btn-primary" id="btnSearch">Search</button>
+        </div>
+
+        <div class=" form-inline float-right">
+            <input type="text" class="form-control" id="nameOwner" placeholder="Name Owner" required />
+
+        </div>
+    </div>
+    <br />
+
+    <div class="container" id="result"></div>
+    <br />
+
+    <div class="container form-inline" style="height: auto" id="consult">
+        <br /><br />
+              <div class="row col-6 in">
+
+                  <div class="col-7" id="summer">
+                      <!--@Html.TextAreaFor(model => model.MedicalChart, new { @class = "form-control", @placeholder = "Medical chart", @id = "summernote" })-->
+                  </div><br />
+              </div>    
+
+              <div class="row col-6">
+                  <div class="form-group col-12">
+                      @Html.LabelFor(d => d.ConsultDate)
+                      @Html.EditorFor(model => model.ConsultDate, new { @class = "form-control col-6", @placeholder = "Consult Date", @id = "consultdate" })
+                  </div><br /><br />
+
+                  <br /><div class="form-group col-5">
+                      @Html.TextBoxFor(model => model.OwnerName, new { @class = "form-control", @placeholder = "Owner Name", @id = "ownername" })
+                  </div><br /><br />
+
+                  <div class="form-group col-5">
+                      @Html.TextBoxFor(model => model.PetName, new { @class = "form-control", @placeholder = "Pet Name", @id = "petname" })
+                  </div><br /><br />
+
+                  <div class="form-group col-5">
+                      @Html.TextBoxFor(model => model.PetWeight, new { @class = "form-control", @placeholder = "Pet Weight", @id = "petweight" })
+                  </div><br /><br />
+
+                  <div class="form-group col-5 float-right">
+                      @Html.TextBoxFor(model => model.PetTemperature, new { @class = "form-control", @placeholder = "Pet Temperature", @id = "pettemperature" })
+                  </div><br /><br /><br />
+
+              </div>
+
+              <div class="col-12">
+                  <button class="btn btn-primary form-control col-12" id="btnSave">Save</button><br /><br />
+              </div>
+
+        
+
+        <div class="container" id="history">
+
+        </div>
+
+    </div>
+
+
+@section scripts
+{
+    <script>
+        var ownerId;
+        var petId;
+        var nameOwner;
+        var namePet;
+
+        $(document).ready(function () {
+            alert();
+
+            $("#summer").summernote({
+                placeholder: "Medical chart",
+                height: 100,// set editor height
+                minHeight: null, // set minimum height of editor
+                maxHeight: null, // set maximum height of editor
+                focus: true // set focus to editable area after initializing summernote
+            });
+
+            $("#btnSearch").click(function () {
+                nameOwner = $("#nameOwner").val();
+                namePet = $("#namePet").val();
+                //alert();
+                $.ajax({
+                    url: "@Url.Action("OnetoOne", "Information")",
+                    data: {
+                       Name: nameOwner,
+                       PetName: namePet
+                     },
+                     type: "Post"
+                })
+                .done(function (data) {
+                    //alert(result);
+                    result(data);
+                    //alert("OwnerId = " + ownerId + "PetId = " + petId);
+                    $("#ownername").val(nameOwner);
+                    $("#petname").val(namePet);
+                })
+            });
+
+            $("#btnSave").click(function () {
+                //alert("OwnerId = " + ownerId + " PetId = " + petId);
+                //alert($("#summer").summernote("code"));
+
+                $.ajax({
+                url: "@Url.Action("Index", "Consult")",
+                    data: dataConsult(),
+                    type: "Post"
+                })
+                .done(function (data) {
+                    alert(data);
+                    //alert("OwnerId = " + ownerId + "PetId = " + petId);
+                    $("#ownername").val(nameOwner);
+                    $("#petname").val(namePet);
+                })
+
+            });
+        });
+
+        function result(data) {
+            //alert(data);
+
+            $("#result").html("");
+            $("#result").append("<div class='col-12' id='headerOwner'></div>");
+            var headerOwner = $("#headerOwner");
+            $("#result").append("<table class= 'table' id = 'petOwner'></table>");
+            var table = $("#petOwner");
+            var nameOwner = "";
+            var controlTr = 1;
+
+            $.each(data, function (index, row) {
+
+                if (nameOwner != data[index]["name"]) {
+                    headerOwner.append("<dt><h3>" + data[index]["name"] + "Pet </h3><h6>(" + data[index]["homeAddress"] + ", " + data[index]["cellphone"] + ")</h6></dt>");
+                    nameOwner = data[index]["name"];
+                    //header = 0;
+                }
+
+                if (controlTr == 1) {
+                    table.append("<tr><th>Name</th><th>Image</th><th>BirthDate</th><th>Age</th><th>Sex</th><th>Specie</th><th>Race</th><th>Color</th><th>Weigth</th><th>Comments</th></tr>");
+                    controlTr = 0;
+                }
+
+                //table.append("<tr><td>" + data[index]["name"] + "</td><td>" + data[index]["image"] + "</td><td>"+data[index]["birthDate"] + "</td><td>" + data[index]["age"] + "</td><td>" + data[index]["sex"] + "</td><td>" + data[index]["specie"] + "</td><td>" + data[index]["race"] + "</td><td>" + data[index]["color"] + "</td><td>" + data[index]["weight"] + "</td><td>" + data[index]["comment"] + "</td>");
+                //table.append("< td ><button onclick='edit(" + data[index]["petId"] + ");' class='btn btn-primary' id='edit'>Edit</button></td>");
+                //table.append("<tr></tr>");
+
+                table.append("<tr>");
+                table.append("<td style='text-align:center'>" + data[index]["petName"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["image"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["birthDate"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["age"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["sex"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["specie"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["race"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["color"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["weight"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["comment"] + "</td>");
+                table.append("<button class='btn btn-primary' onclick='fnGetId(" + data[index]["ownerId"] + "," + data[index]["petId"] + "); ' >Acept</button>");
+                table.append("</tr>");
+            });
+
+        }
+
+        function fnGetId(ownerid, petid) {
+            //alert();
+            ownerId = ownerid;
+            petId = petid;
+            $("#result").html("");
+        }
+
+        function dataConsult() {
+            data = {
+                PetId: petId,
+                OwnerName: nameOwner,
+                PetName: namePet,
+                ConsultDate: $("#ConsultDate").val(),
+                PetWeight: $("#petweight").val(),
+                PetTemperature: $("#pettemperature").val(),
+                MedicalChart: $("#summer").summernote("code")
+            }
+            return data;
+        }
+
+    </script>
+}

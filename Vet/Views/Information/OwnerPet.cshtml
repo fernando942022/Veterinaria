@@ -1,0 +1,212 @@
+﻿@model List<Vet.MyModels.Info>
+
+<br />
+
+@{
+    var name = "";
+    var headerTr = 1;
+}
+
+<div class="col-12">
+    <div class="form-inline float-lg-right">
+        <input type="text" class="form-control" id="namePet" placeholder="Name Pet" required/>
+        <button class="form-control btn btn-primary" id="btnSearch">Search</button>
+    </div>
+
+    <div class=" form-inline float-right">
+        <input type="text" class="form-control" id="nameOwner" placeholder="Name Owner" required/>
+
+    </div>
+</div><br />
+
+<div class="container" id="result">
+    @foreach (var columnData in Model)
+    {
+        @if (name != @columnData.Name)
+        {
+            <dt>
+                <h3>@columnData.Name Pet </h3><h6>(@columnData.HomeAddress, @columnData.Cellphone)</h6>
+            </dt>
+
+            name = @columnData.Name;
+            headerTr = 1;
+        }
+
+        <dd class="col-sm-10">
+            <table class="table">
+                @if (headerTr == 1)
+                {
+                    <tr>
+                        <th>Name</th>
+                        <th>Image</th>
+                        <th>BirthDate</th>
+                        <th>Age</th>
+                        <th>Sex</th>
+                        <th>Specie</th>
+                        <th>Race</th>
+                        <th>Color</th>
+                        <th>Weigth</th>
+                        <th>Comments</th>
+                    </tr>
+                    headerTr = 0;
+                }
+
+                <tr>
+                    <td>@columnData.PetName</td>
+                    <td>@columnData.Image</td>
+                    <td>@columnData.BirthDate</td>
+                    <td>@columnData.Age</td>
+                    <td>@columnData.Sex</td>
+                    <td>@columnData.Specie</td>
+                    <td>@columnData.Race</td>
+                    <td>@columnData.Color</td>
+                    <td>@columnData.weight</td>
+                    <td>@columnData.Comment</td>
+                    <td>
+                        <button onclick="document.location.href = '@Url.Content("~/Pet/Edit/?id="+columnData.PetId+"="+columnData.OwnerId+"="+columnData.Name)'" class="btn btn-primary" id="edit">Edit</button>                
+                    </td>
+
+                </tr>
+
+            </table>
+        </dd>
+    }
+
+    <!--<dt class="col-sm-2">
+        <label>hola</label>
+    </dt>
+    <dd class="col-sm-10">
+        <label>hola</label>
+    </dd>
+
+    <dt class="col-sm-2">
+        <label>hola</label>
+    </dt>
+    <dd class="col-sm-10">
+        <table class="table">
+            <tr>
+                <th>Course Title</th>
+                <th>Grade</th>
+            </tr>
+
+        </table>
+    </dd>-->
+
+    <br />
+    <br />
+
+</div>
+
+@section scripts
+{
+    <script>
+
+
+       $(document).ready(function () {
+            //alert();
+            $("#btnSearch").click(function () {
+                var nameOwner = $("#nameOwner").val();
+                var namePet = $("#namePet").val();
+
+                if (nameOwner != "" && namePet == "") {
+                    //alert("Pet vacio");
+                    $.ajax({
+                        url: "@Url.Action("ByOwner", "Information")",
+                        data: { nameOwner },
+                        type: "Post"
+                     })
+                    .done(function (data) {
+                        result(data);
+                    })
+                }
+
+//=================================================================================================================================
+
+                if (nameOwner == "" && namePet != "") {
+                    //alert("Owner vacio");
+                    $.ajax({
+                        url: "@Url.Action("ByPet", "Information")",
+                        data: { namePet },
+                        type: "Post"
+                     })
+                        .done(function (data) {
+                            result(data);
+                        })
+                }
+
+
+                if (nameOwner != "" && namePet != "") {
+                    //alert(nameOwner + " <> " + namePet);
+                    $.ajax({
+                        url: "@Url.Action("OnetoOne", "Information")",
+                        data: {
+                            Name: nameOwner,
+                            PetName: namePet
+                        },
+                        type: "Post"
+                     })
+                    .done(function (data) {
+                        //alert(result);
+                         result(data);
+                    })
+                }
+
+                if (nameOwner == "" && namePet == "") {
+                    //alert("You must fill in at least one field");
+                    document.location.href = "@Url.Content("~/Information/OwnerPet")";
+                }
+            });
+
+        });
+
+        function result(data) {
+            $("#result").html("");
+            $("#result").append("<div class='col-12' id='headerOwner'></div>");
+            var headerOwner = $("#headerOwner");
+            $("#result").append("<table class= 'table' id = 'petOwner'></table>");
+            var table = $("#petOwner");
+            var nameOwner = "";
+            var controlTr = 1;
+
+            $.each(data, function (index, row) {
+
+                if (nameOwner != data[index]["name"]) {
+                    headerOwner.append("<dt><h3>" + data[index]["name"] + "Pet </h3><h6>(" + data[index]["homeAddress"] + ", " + data[index]["cellphone"] + ")</h6></dt>");
+                    nameOwner = data[index]["name"];
+                    //header = 0;
+                }
+
+                if (controlTr == 1) {
+                    table.append("<tr><th>Name</th><th>Image</th><th>BirthDate</th><th>Age</th><th>Sex</th><th>Specie</th><th>Race</th><th>Color</th><th>Weigth</th><th>Comments</th></tr>");
+                    controlTr = 0;
+                }
+
+                //table.append("<tr><td>" + data[index]["name"] + "</td><td>" + data[index]["image"] + "</td><td>"+data[index]["birthDate"] + "</td><td>" + data[index]["age"] + "</td><td>" + data[index]["sex"] + "</td><td>" + data[index]["specie"] + "</td><td>" + data[index]["race"] + "</td><td>" + data[index]["color"] + "</td><td>" + data[index]["weight"] + "</td><td>" + data[index]["comment"] + "</td>");
+                //table.append("< td ><button onclick='edit(" + data[index]["petId"] + ");' class='btn btn-primary' id='edit'>Edit</button></td>");
+                //table.append("<tr></tr>");
+
+                table.append("<tr>");
+                table.append("<td style='text-align:center'>" + data[index]["petName"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["image"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["birthDate"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["age"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["sex"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["specie"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["race"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["color"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["weight"] + "</td>");
+                table.append("<td style='text-align:center'>" + data[index]["comment"] + "</td>");
+                table.append("<button class='btn btn-primary' onclick='fnEdit(" + data[index]["petId"] + "); ' >Edit</button>");
+                table.append("</tr>");
+            });
+
+        }
+
+        function fnEdit(petId) {
+            alert(petId);
+            document.location.href = "@Url.Content("~/Pet/Edit/?id=")" + petId;
+        }
+    </script>
+
+}
+
