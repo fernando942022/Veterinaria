@@ -69,5 +69,12 @@ namespace Vet.Controllers
             //return Redirect(Url.Content("~/Information/ShowOwner"));
             return Json("Saved data...");
         }
+
+        //Obtiene el registro de todas las masacotas. Recibe un dato int el cual no utilizamos, solomente se envia como parte del ajax
+        //[HttpPost]
+        //public IActionResult ShowPets(int dataTest)
+        //{
+          //  return Json(Dbcon.Pets.ToList());
+        //}
     }
 }

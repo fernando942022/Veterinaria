@@ -33,8 +33,7 @@ namespace Vet.Models
         public DateTime ConsultDate { get; set; }
 
         [Required]
-        [StringLength(20)]
-        [Display(Name = "Pet weight")]
+        [Display(Name = "Pet weight(Kgs)")]
         public int PetWeight { get; set; }
 
         [Required]

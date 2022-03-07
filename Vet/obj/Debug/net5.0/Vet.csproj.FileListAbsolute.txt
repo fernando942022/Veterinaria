@@ -442,3 +442,5 @@ C:\Users\FFernandez\source\repos\Vet\Vet\bin\Debug\net5.0\ru\Microsoft.CodeAnaly
 C:\Users\FFernandez\source\repos\Vet\Vet\bin\Debug\net5.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\FFernandez\source\repos\Vet\Vet\bin\Debug\net5.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\FFernandez\source\repos\Vet\Vet\bin\Debug\net5.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+C:\Users\FFernandez\source\repos\Vet\Vet\obj\Debug\net5.0\Razor\Views\Consult\Add.cshtml.g.cs
+C:\Users\FFernandez\source\repos\Vet\Vet\obj\Debug\net5.0\Razor\Views\Consult\NewConsult.cshtml.g.cs

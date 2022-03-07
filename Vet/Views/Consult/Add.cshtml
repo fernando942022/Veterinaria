@@ -1,0 +1,187 @@
+﻿@model Vet.Models.Consult
+
+<h3>Consult</h3>
+<br />
+
+<div class="container form-inline" style="height: auto" id="consult">
+    <br /><br />
+    <div class="row col-6 in">
+
+        <div class="col-7" id="summer">
+
+        </div><br />
+    </div>
+
+    <div class="row col-6">
+        <div class="form-group col-12">
+            @Html.LabelFor(model => model.ConsultDate)<br />
+            @Html.EditorFor(model => model.ConsultDate, new { @class = "form-control col-6", @id = "consultdate" })
+        </div><br /><br />
+
+        <br /><div class="form-group col-5">
+            @Html.LabelFor(model => model.OwnerName)<br />
+            @Html.TextBoxFor(model => model.OwnerName, new { @class = "form-control", @id = "ownername" })
+        </div><br /><br />
+
+        <div class="form-group col-5">
+            @Html.LabelFor(model => model.PetName)<br />
+            @Html.TextBoxFor(model => model.PetName, new { @class = "form-control", @id = "petname" })
+        </div><br /><br /><br /><br />
+
+        <div class="form-group col-5">
+            @Html.LabelFor(model => model.PetWeight)<br />
+            @Html.TextBoxFor(model => model.PetWeight, new { @class = "form-control", @id = "petweight" })
+        </div><br /><br />
+
+        <div class="form-group col-5 float-right">
+            @Html.LabelFor(model => model.PetTemperature)<br />
+            @Html.TextBoxFor(model => model.PetTemperature, new { @class = "form-control", @id = "pettemperature" })
+        </div><br /><br /><br />
+
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-primary form-control col-12" id="btnSave">Save</button><br /><br />
+    </div>
+
+</div>
+<br />
+
+<div class="container" id="history">
+
+</div>
+
+@section scripts
+{
+    <script>
+        var ownerId;
+        var petId;
+        var nameOwner;
+        var namePet;
+
+        $(document).ready(function () {
+            var dirUrl = $(location).attr('search').split("=");
+            petId = parseInt(dirUrl[1]);
+
+            if (dirUrl.length > 3) {
+                nameOwner = dirUrl[3].replace("%20", " ");
+                namePet = dirUrl[2].replace("%20", " ");
+                //alert(nameOwner + " <> " + namePet);
+            }
+            else {
+                //si dirUrl no es mayor que 3 es porque solo le hemos enviado el petId y el ownerId
+                // procedemos a realizar un ajax para obtener el petName y el ownerName.
+                //el petId ya lo tenemos, ahora obtenemos de la url el ownerId y lo convertimos en int.
+                ownerId = parseInt(dirUrl[2]);
+                $.ajax({
+                    url: "@Url.Action("SearchOwnerPet", "Information")",
+                    data: { petId },
+                    type: "Post"
+                    }).done(function (result) {
+                        // Con el resulatdo obtenido le asignamos el petName y el ownerName a variables correspondientes.
+                        $("#ownername").val(result[0]["name"]);
+                        $("#petname").val(result[0]["petName"]);
+                        //alert(nameOwner + " : " + namePet);
+                    });
+
+            }
+            
+            $("#ownername").val(nameOwner);
+            $("#petname").val(namePet);
+
+            $("#summer").summernote({
+                placeholder: "Medical chart",
+                height: 100,// set editor height
+                minHeight: null, // set minimum height of editor
+                maxHeight: null, // set maximum height of editor
+                //focus: true // set focus to editable area after initializing summernote
+            });
+            //alert();
+            //con este ajax buscamos si la mascota ya tiene un historial de consultas.
+            $.ajax({
+                url: "@Url.Action("SearchConsult", "Consult")",
+                data: { petId },
+                type: "Post"
+            }).done(function (result) {
+                // si el resultado de la consulta tiene registro se genera la tabla
+                if (result != "") {
+                    CreateTable(result);
+
+                }
+                else {
+                    alert("There is not consults record for this pet");
+
+                }
+
+            });
+
+            $("#btnSave").click(function () {
+                $.ajax({
+                url: "@Url.Action("Add", "Consult")",
+                data: dataConsult(),
+                type: "Post"
+                }).done(function (result) {
+                    if (result != "") {
+                        //si el div history esta vacio significa que la mascota no tiene historial de consulta
+                        //genero la tabla sino solo agrego fila a la tabla
+                        if ($("#history").children().length == 0) {
+                            CreateTable(result);
+                        }
+                        else {
+                            CreateRow(result);
+                            //console.info($("#tableHistory").length);
+                        }
+
+                    }
+                    else {
+                        alert("Not consult register for pet");
+                    }
+                });
+            });
+
+        });
+
+        function CreateTable(result) {
+            var history = $("#history");
+            history.html("");
+            history.append("<h5>Pet history</h5>");
+            history.append("<table class='table col-12 table-striped' id='tableHistory'></table>");
+            table = $("#tableHistory");
+            table.append("<tr><th>Date</th><th>Name</th><th>Comments</th></tr>");
+
+            $.each(result, function (index, col) {
+                //alert(data[index]["petName"]);
+                table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td >/tr>");
+                //table.append("<td>" + result[index]["consultDate"] + "</td > ");
+                //table.append("<td>" + result[index]["petName"] + "</td > ");
+                //table.append("<td>" + result[index]["medicalChart"] + "</td > ");
+                //table.append("</tr>");
+
+            });
+
+        }
+
+        function dataConsult() {
+            data = {
+                PetId: petId,
+                OwnerName: $("#ownername").val(),
+                PetName: $("#petname").val(),
+                ConsultDate: $("#ConsultDate").val(),
+                PetWeight: parseInt($("#petweight").val()),
+                PetTemperature: $("#pettemperature").val(),
+                MedicalChart: $("#summer").summernote("code")
+            }
+            return data;
+        }
+
+        function CreateRow(result) {
+            table = $("#tableHistory");
+            table.append("<tr>");
+            table.append("<td>" + result["consultDate"] + "</td > ");
+            table.append("<td>" + result["petName"] + "</td > ");
+            table.append("<td>" + result["medicalChart"] + "</td > ");
+            table.append("</tr>");
+        }
+
+    </script>
+}

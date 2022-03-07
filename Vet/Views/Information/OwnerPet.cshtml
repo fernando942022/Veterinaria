@@ -32,7 +32,7 @@
             headerTr = 1;
         }
 
-        <dd class="col-sm-10">
+        <dd class="col-12">
             <table class="table">
                 @if (headerTr == 1)
                 {
@@ -51,22 +51,25 @@
                     headerTr = 0;
                 }
 
-                <tr>
-                    <td>@columnData.PetName</td>
-                    <td>@columnData.Image</td>
-                    <td>@columnData.BirthDate</td>
-                    <td>@columnData.Age</td>
-                    <td>@columnData.Sex</td>
-                    <td>@columnData.Specie</td>
-                    <td>@columnData.Race</td>
-                    <td>@columnData.Color</td>
-                    <td>@columnData.weight</td>
-                    <td>@columnData.Comment</td>
-                    <td>
-                        <button onclick="document.location.href = '@Url.Content("~/Pet/Edit/?id="+columnData.PetId+"="+columnData.OwnerId+"="+columnData.Name)'" class="btn btn-primary" id="edit">Edit</button>                
-                    </td>
+            <tr>
+                <td>@columnData.PetName</td>
+                <td>@columnData.Image</td>
+                <td>@columnData.BirthDate</td>
+                <td>@columnData.Age</td>
+                <td>@columnData.Sex</td>
+                <td>@columnData.Specie</td>
+                <td>@columnData.Race</td>
+                <td>@columnData.Color</td>
+                <td>@columnData.weight</td>
+                <td>@columnData.Comment</td>
+                <td>
+                    <button onclick="document.location.href = '@Url.Content("~/Pet/Edit/?id="+columnData.PetId+"="+columnData.OwnerId+"="+columnData.Name)'" class="btn btn-primary" id="edit">Edit</button>
+                </td>
 
-                </tr>
+                <td>
+                    <button onclick="document.location.href = '@Url.Content("~/Consult/Add/?id="+columnData.PetId+"="+columnData.PetName+"="+columnData.Name)'" class="btn btn-primary" >Consult</button>
+                </td>
+            </tr>
 
             </table>
         </dd>
@@ -100,8 +103,7 @@
 @section scripts
 {
     <script>
-
-
+        var params = {};
        $(document).ready(function () {
             //alert();
             $("#btnSearch").click(function () {
@@ -169,6 +171,12 @@
             var controlTr = 1;
 
             $.each(data, function (index, row) {
+                // variable objeto para poder pasar mas de 2 valores como parametros a una funcion
+                params = {
+                    petId: data[index]["petId"],
+                    petName: data[index]["petName"],
+                    petOwner: data[index]["name"]
+                };
 
                 if (nameOwner != data[index]["name"]) {
                     headerOwner.append("<dt><h3>" + data[index]["name"] + "Pet </h3><h6>(" + data[index]["homeAddress"] + ", " + data[index]["cellphone"] + ")</h6></dt>");
@@ -197,15 +205,23 @@
                 table.append("<td style='text-align:center'>" + data[index]["weight"] + "</td>");
                 table.append("<td style='text-align:center'>" + data[index]["comment"] + "</td>");
                 table.append("<button class='btn btn-primary' onclick='fnEdit(" + data[index]["petId"] + "); ' >Edit</button>");
+                table.append("<button class='btn btn-primary' onclick='fnConsult(" + data[index]["petId"] + "," + data[index]["ownerId"] + "); '>Consult</button>");
                 table.append("</tr>");
             });
 
         }
 
         function fnEdit(petId) {
-            alert(petId);
+            //alert(petId);
             document.location.href = "@Url.Content("~/Pet/Edit/?id=")" + petId;
         }
+
+        function fnConsult(petId, ownerId) {
+            //console.log(dataParams[1]);
+            //alert(petId + " <> " + ownerId);
+            document.location.href = "@Url.Content("~/Consult/Add/?id=")" + petId + "=" + ownerId;
+        }
+
     </script>
 
 }

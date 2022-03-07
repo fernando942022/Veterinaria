@@ -1,0 +1,205 @@
+﻿@model Vet.Models.Consult
+<h3>New Consult</h3>
+<br />
+<br />
+
+<div class="container form-inline" style="height: auto" id="consult">
+    <br /><br />
+    <div class="row col-6 in">
+
+        <div class="col-7" id="summer">
+
+        </div><br />
+    </div>
+
+    <div class="row col-6">
+        <div class="form-group col-12">
+            <label>Consult Date </label><br />
+            <input type="datetime-local" class="form-control" id="ConsultDate"/>
+        </div><br /><br />
+
+        <br /><div class="form-group col-5">
+            @Html.LabelFor(model => model.OwnerName)<br />
+            @Html.TextBoxFor(model => model.OwnerName, new { @class = "form-control", @id = "ownername" })
+        </div><br /><br />
+
+        <div class="form-group col-5">
+            @Html.LabelFor(model => model.PetName)<br />            
+            <select class="form-control col-12" id="selectPets">
+                <option>Pets</option>
+            </select>
+        </div><br /><br /><br /><br />
+
+        <div class="form-group col-5">
+            @Html.LabelFor(model => model.PetWeight)
+            @Html.TextBoxFor(model => model.PetWeight, new { @class = "form-control", @id = "petweight" })
+        </div><br /><br />
+
+        <div class="form-group col-5 float-right">
+            @Html.LabelFor(model => model.PetTemperature)<br />
+            @Html.TextBoxFor(model => model.PetTemperature, new { @class = "form-control", @id = "pettemperature" })
+        </div><br /><br /><br />
+
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-primary form-control col-12" id="btnSave">Save</button><br /><br />
+    </div>
+
+</div>
+<br />
+
+<div class="container" id="history">
+
+</div>
+
+@section scripts
+{
+    <script>
+        //Esta variable global almacenara el petId que utilizaremos en todo el codigo dentro de las funciones.
+        var petId;
+        var petName; //nombre de la mascota
+
+        $(document).ready(function () {
+            //este dato no se utiliza, solamente se envia como parametro de ajax
+            var datatest = 1;
+            $("#summer").summernote({
+                placeholder: "Medical chart",
+                height: 100,// set editor height
+                minHeight: null, // set minimum height of editor
+                maxHeight: null, // set maximum height of editor
+                //focus: true // set focus to editable area after initializing summernote
+            })
+
+            $.ajax({
+                url: "@Url.Action("OwnerPet", "Information")",
+                data: datatest,
+                type: "Post"
+            }).done(function (result) {
+                // si el resultado de la consulta tiene registro se genera la tabla
+                if (result != "") {
+
+                    $.each(result, function (index, row) {
+                        $("#selectPets").append("<option value='" + result[index]["petId"] + "-" + result[index]["name"] + "-" + result[index]["petName"] + "'>" + result[index]["petName"] + "</option > ");
+                    });
+                    console.info(result);
+                }
+                else {
+                    alert("Not consult register for pet");
+
+                }
+
+            });
+        });
+
+        //Este evento se ejecuta cuando el usuario seleciona una mascota
+        //dentro del evento obtenemos el nombre del owner y el petId los cuales estan asociados al value de cada option de cada mascota
+        $("#selectPets").change(function () {
+            alert($(this).val());
+
+            var sOptionValues = $(this).val().split("-");
+            petId = parseInt(sOptionValues[0]);
+            petName = sOptionValues[2];
+            //alert(petId);
+            $("#ownername").val(sOptionValues[1]);
+
+            //con este ajax buscamos si la mascota ya tiene un historial de consultas.
+            $.ajax({
+                url: "@Url.Action("SearchConsult", "Consult")",
+                data: { petId },
+                type: "Post"
+            }).done(function (result) {
+                // si el resultado de la consulta tiene registro se genera la tabla
+                if (result != "") {
+                    CreateTable(result);
+
+                }
+                else {
+                    //var history = $("#history");
+                    alert("There is not consults record for this pet");
+                    $("#history").html("");
+                }
+
+            });
+
+
+        });
+
+        $("#btnSave").click(function () {
+            alert(petId + " <> " + petName);
+
+            $.ajax({
+                url: "@Url.Action("Add", "Consult")",
+                data: dataConsult(),
+                type: "Post"
+                }).done(function (result) {
+                    if (result != "") {
+                        alert(result.length);
+                        //si el div history esta vacio significa que la mascota no tiene historial de consulta
+                        //genero la tabla sino solo agrego fila a la tabla
+                        if ($("#history").children().length == 0) {
+                            CreateTable(result);
+                        }
+                        else {
+                            CreateRow(result);
+                            //console.info($("#tableHistory").length);
+                        }
+
+                    }
+                    else {
+                        alert("Not consult register for pet");
+                    }
+                });
+
+        });
+
+
+        function CreateTable(result) {
+            alert(result.length);
+            var history = $("#history");
+            history.html("");
+            history.append("<h5>Pet history</h5>");
+            history.append("<table class='table col-12 table-striped' id='tableHistory'></table>");
+            table = $("#tableHistory");
+            table.append("<tr><th>Date</th><th>Name</th><th>Comments</th></tr>");
+
+            //if (result.length > 1) {
+                $.each(result, function (index, col) {
+                    //alert(result[index]["petName"]);
+                    table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td >/tr>");
+
+                });
+            //}
+            //else {
+              //  alert(result["petName"]);
+                //table.append("<tr><td>" + result[0]["consultDate"] + "</td ><td>" + result[0]["petName"] + "</td ><td>" + result[0]["medicalChart"] + "</td >/tr>");
+            //}
+
+        }
+
+        function dataConsult() {
+            data = {
+                PetId: petId,
+                OwnerName: $("#ownername").val(),
+                PetName: petName,
+                ConsultDate: $("#ConsultDate").val(),
+                PetWeight: parseInt($("#petweight").val()),
+                PetTemperature: $("#pettemperature").val(),
+                MedicalChart: $("#summer").summernote("code")
+            }
+            return data;
+        }
+
+        function CreateRow(result) {
+            table = $("#tableHistory");
+            table.append("<tr>");
+            table.append("<td>" + result[0]["consultDate"] + "</td > ");
+            table.append("<td>" + result[0]["petName"] + "</td > ");
+            table.append("<td>" + result[0]["medicalChart"] + "</td > ");
+            table.append("</tr>");
+            //table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td >/tr>");
+        }
+
+    </script>
+
+}
