@@ -1,6 +1,6 @@
 ﻿@model Vet.Models.Consult
 
-<h3>Consult</h3>
+<h3 id="headerH3">Consult</h3>
 <br />
 
 <div class="container form-inline" style="height: auto" id="consult">
@@ -15,7 +15,8 @@
     <div class="row col-6">
         <div class="form-group col-12">
             @Html.LabelFor(model => model.ConsultDate)<br />
-            @Html.EditorFor(model => model.ConsultDate, new { @class = "form-control col-6", @id = "consultdate" })
+            <input type="datetime-local" class="form-control" id="consultdate" />
+            <!--@Html.EditorFor(model => model.ConsultDate, new { @class = "form-control col-6", @id = "consultdate" })-->
         </div><br /><br />
 
         <br /><div class="form-group col-5">
@@ -23,7 +24,7 @@
             @Html.TextBoxFor(model => model.OwnerName, new { @class = "form-control", @id = "ownername" })
         </div><br /><br />
 
-        <div class="form-group col-5">
+        <div class="form-group col-5" id="divPetname">
             @Html.LabelFor(model => model.PetName)<br />
             @Html.TextBoxFor(model => model.PetName, new { @class = "form-control", @id = "petname" })
         </div><br /><br /><br /><br />
@@ -54,29 +55,41 @@
 @section scripts
 {
     <script>
+        var dirUrl = $(location).attr('search').split("=");
         var ownerId;
         var petId;
         var nameOwner;
         var namePet;
+        //EStas variables las usaremos cuando vayamos a crear una consulta nueva a partir de la lista de consultas y no de la lsita de mascotas
+        var petId1;
 
         $(document).ready(function () {
-            var dirUrl = $(location).attr('search').split("=");
-            petId = parseInt(dirUrl[1]);
 
-            if (dirUrl.length > 3) {
-                nameOwner = dirUrl[3].replace("%20", " ");
-                namePet = dirUrl[2].replace("%20", " ");
-                //alert(nameOwner + " <> " + namePet);
+            //Si el segundo valor de la url es new es porque proviene de la lista de consultas y no de mascotas.
+            if (dirUrl[2] == "new") {
+                alert(dirUrl[2]);
+                $("#headerH3").text("New Consult");
+                $("#petname").remove();
+                $("#divPetname").append("<select id='selectPets' class='form-control col-12'><option>Pet Name</option></option></select>");
             }
             else {
-                //si dirUrl no es mayor que 3 es porque solo le hemos enviado el petId y el ownerId
-                // procedemos a realizar un ajax para obtener el petName y el ownerName.
-                //el petId ya lo tenemos, ahora obtenemos de la url el ownerId y lo convertimos en int.
-                ownerId = parseInt(dirUrl[2]);
-                $.ajax({
-                    url: "@Url.Action("SearchOwnerPet", "Information")",
-                    data: { petId },
-                    type: "Post"
+            //Aqui realizamos el codigo correspondiente a la url que proviene de las mascotas
+                petId = parseInt(dirUrl[1]);
+
+                if (dirUrl.length > 3) {
+                    nameOwner = dirUrl[3].replace("%20", " ");
+                    namePet = dirUrl[2].replace("%20", " ");
+                    //alert(nameOwner + " <> " + namePet);
+                }
+                else {
+                    //si dirUrl no es mayor que 3 es porque solo le hemos enviado el petId y el ownerId
+                    // procedemos a realizar un ajax para obtener el petName y el ownerName.
+                    //el petId ya lo tenemos, ahora obtenemos de la url el ownerId y lo convertimos en int.
+                    ownerId = parseInt(dirUrl[2]);
+                    $.ajax({
+                        url: "@Url.Action("SearchOwnerPet", "Information")",
+                        data: { petId },
+                        type: "Post"
                     }).done(function (result) {
                         // Con el resulatdo obtenido le asignamos el petName y el ownerName a variables correspondientes.
                         $("#ownername").val(result[0]["name"]);
@@ -84,10 +97,14 @@
                         //alert(nameOwner + " : " + namePet);
                     });
 
+                }
+
+                SearchPet(petId);
+
+                $("#ownername").val(nameOwner);
+                $("#petname").val(namePet);
             }
-            
-            $("#ownername").val(nameOwner);
-            $("#petname").val(namePet);
+
 
             $("#summer").summernote({
                 placeholder: "Medical chart",
@@ -98,22 +115,7 @@
             });
             //alert();
             //con este ajax buscamos si la mascota ya tiene un historial de consultas.
-            $.ajax({
-                url: "@Url.Action("SearchConsult", "Consult")",
-                data: { petId },
-                type: "Post"
-            }).done(function (result) {
-                // si el resultado de la consulta tiene registro se genera la tabla
-                if (result != "") {
-                    CreateTable(result);
-
-                }
-                else {
-                    alert("There is not consults record for this pet");
-
-                }
-
-            });
+            
 
             $("#btnSave").click(function () {
                 $.ajax({
@@ -140,6 +142,26 @@
             });
 
         });
+
+        function SearchPet(petId) {
+            //con este ajax buscamos si la mascota ya tiene un historial de consultas.
+            $.ajax({
+                url: "@Url.Action("SearchConsult", "Consult")",
+                data: { petId },
+                type: "Post"
+            }).done(function (result) {
+                // si el resultado de la consulta tiene registro se genera la tabla
+                if (result != "") {
+                    CreateTable(result);
+
+                }
+                else {
+                    alert("There is not consults record for this pet");
+
+                }
+
+            });
+        }
 
         function CreateTable(result) {
             var history = $("#history");
