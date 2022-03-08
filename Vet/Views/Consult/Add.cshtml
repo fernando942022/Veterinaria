@@ -67,18 +67,48 @@
 
             //Si el segundo valor de la url es new es porque proviene de la lista de consultas y no de mascotas.
             if (dirUrl[2] == "new") {
-                alert(dirUrl[2]);
+                //alert(dirUrl[2] + " <> " + $("#headerH3").text());
                 $("#headerH3").text("New Consult");
                 $("#petname").remove();
                 $("#divPetname").append("<select id='selectPets' class='form-control col-12'><option>Pet Name</option></option></select>");
+                alert($("#selectPets").val());
+
+                //este dato no se utiliza, solamente se envia como parametro de ajax
+                var datatest = 1;
+
+                //Con este ajax cargamos la lista de mascotas con su id, petname y ownername en el elemento <select></select>
+                $.ajax({
+                    url: "@Url.Action("OwnerPet", "Information")",
+                    data: datatest,
+                    type: "Post"
+                }).done(function (result) {
+                    // si el resultado de la consulta tiene registro se genera la lista
+                    if (result != "") {
+
+                        $.each(result, function (index, row) {
+                            $("#selectPets").append("<option value='" + result[index]["petId"] + "-" + result[index]["name"] + "-" + result[index]["petName"] + "'>" + result[index]["petName"] + "</option > ");
+                        });
+                        //console.info(result);
+                    }
+                    else {
+                        alert("Error, there is not list Pets-Owner");
+
+                    }
+
+                });
             }
+
             else {
-            //Aqui realizamos el codigo correspondiente a la url que proviene de las mascotas
+                //Aqui realizamos el codigo correspondiente a la url que proviene de las mascotas
                 petId = parseInt(dirUrl[1]);
 
+                //si dirUrl es mayor que 3 es porque le hemos enviado el petId, el petName y el ownerName
                 if (dirUrl.length > 3) {
                     nameOwner = dirUrl[3].replace("%20", " ");
                     namePet = dirUrl[2].replace("%20", " ");
+                    $("#ownername").val(nameOwner);
+                    $("#petname").val(namePet);
+                //$("#petname").val(namePet);
                     //alert(nameOwner + " <> " + namePet);
                 }
                 else {
@@ -94,15 +124,17 @@
                         // Con el resulatdo obtenido le asignamos el petName y el ownerName a variables correspondientes.
                         $("#ownername").val(result[0]["name"]);
                         $("#petname").val(result[0]["petName"]);
-                        //alert(nameOwner + " : " + namePet);
+                        nameOwner = result[0]["name"];
+                        namePet = result[0]["petName"];
+                        
                     });
 
                 }
 
                 SearchPet(petId);
-
-                $("#ownername").val(nameOwner);
-                $("#petname").val(namePet);
+                
+                //$("#ownername").val(nameOwner);
+                //$("#petname").val(namePet);
             }
 
 
@@ -115,13 +147,13 @@
             });
             //alert();
             //con este ajax buscamos si la mascota ya tiene un historial de consultas.
-            
+
 
             $("#btnSave").click(function () {
                 $.ajax({
-                url: "@Url.Action("Add", "Consult")",
-                data: dataConsult(),
-                type: "Post"
+                    url: "@Url.Action("Add", "Consult")",
+                    data: dataConsult(),
+                    type: "Post"
                 }).done(function (result) {
                     if (result != "") {
                         //si el div history esta vacio significa que la mascota no tiene historial de consulta
@@ -136,9 +168,26 @@
 
                     }
                     else {
-                        alert("Not consult register for pet");
+                        alert("Erro to save consult");
                     }
                 });
+            });
+
+            //Con el metodo unbind desasociamos la funcion change del ajax ya que alli se genero dinamicamente las opciones del select,
+            //luego volvemos a asignarle un manejador para podedr ejecutar el evento change fuera del ajax.
+            $("#selectPets").unbind("change").bind("change", function () {
+                //alert();
+                alert($(this).val());
+
+                var sOptionValues = $(this).val().split("-");
+                petId = parseInt(sOptionValues[0]);
+                namePet = sOptionValues[2];
+                //alert(petId);
+                $("#ownername").val(sOptionValues[1]);
+
+                //Esta funcion busca un de la mascota segun su petId historial de consultas.
+                SearchPet(petId);
+
             });
 
         });
@@ -156,7 +205,11 @@
 
                 }
                 else {
-                    alert("There is not consults record for this pet");
+                    //alert("There is not consults record for this pet");
+                    var history = $("#history");
+                    history.html("");
+                    history.append("<h5>Pet history" +"<h6>(There is not consults record for this pet)</h6>"+ "</h5>");
+                    history.append("<table class='table col-12 table-striped' id='tableHistory'> <tr><th>Date</th><th>Name</th><th>Comments</th></tr> </table>");
 
                 }
 
@@ -184,11 +237,12 @@
         }
 
         function dataConsult() {
+            //alert(namePet);
             data = {
                 PetId: petId,
                 OwnerName: $("#ownername").val(),
-                PetName: $("#petname").val(),
-                ConsultDate: $("#ConsultDate").val(),
+                PetName: namePet,
+                ConsultDate: $("#consultdate").val(),
                 PetWeight: parseInt($("#petweight").val()),
                 PetTemperature: $("#pettemperature").val(),
                 MedicalChart: $("#summer").summernote("code")
@@ -198,12 +252,12 @@
 
         function CreateRow(result) {
             table = $("#tableHistory");
-            table.append("<tr>");
-            table.append("<td>" + result["consultDate"] + "</td > ");
-            table.append("<td>" + result["petName"] + "</td > ");
-            table.append("<td>" + result["medicalChart"] + "</td > ");
-            table.append("</tr>");
+
+            $.each(result, function (index, col) {
+                table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td ></tr>");
+            });
         }
+
 
     </script>
 }

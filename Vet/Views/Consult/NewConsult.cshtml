@@ -71,12 +71,13 @@
                 //focus: true // set focus to editable area after initializing summernote
             })
 
+            //Con este ajax cargamos la lista de mascotas con su id, petname y ownername en el elemento <select></select>
             $.ajax({
                 url: "@Url.Action("OwnerPet", "Information")",
                 data: datatest,
                 type: "Post"
             }).done(function (result) {
-                // si el resultado de la consulta tiene registro se genera la tabla
+                // si el resultado de la consulta tiene registro se genera la lista
                 if (result != "") {
 
                     $.each(result, function (index, row) {
@@ -85,7 +86,7 @@
                     console.info(result);
                 }
                 else {
-                    alert("Not consult register for pet");
+                    alert("Error, there is not list Pets-Owner");
 
                 }
 

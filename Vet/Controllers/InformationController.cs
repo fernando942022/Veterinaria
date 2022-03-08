@@ -237,7 +237,7 @@ namespace Vet.Controllers
 
         }
 
-        //Busca un registro de un propietario y una mascota especifico segun sus IDs.
+        //Busca un registro de un propietario y una mascota especifico segun su ID.
         [HttpPost]
         public IActionResult SearchOwnerPet(int petId)
         {
