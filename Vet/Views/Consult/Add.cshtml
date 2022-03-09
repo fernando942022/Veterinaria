@@ -63,6 +63,7 @@
         //EStas variables las usaremos cuando vayamos a crear una consulta nueva a partir de la lista de consultas y no de la lsita de mascotas
         var petId1;
 
+        $("#consultdate").val("03/08/2022");
         $(document).ready(function () {
 
             //Si el segundo valor de la url es new es porque proviene de la lista de consultas y no de mascotas.
@@ -126,13 +127,13 @@
                         $("#petname").val(result[0]["petName"]);
                         nameOwner = result[0]["name"];
                         namePet = result[0]["petName"];
-                        
+
                     });
 
                 }
 
                 SearchPet(petId);
-                
+
                 //$("#ownername").val(nameOwner);
                 //$("#petname").val(namePet);
             }
@@ -177,7 +178,7 @@
             //luego volvemos a asignarle un manejador para podedr ejecutar el evento change fuera del ajax.
             $("#selectPets").unbind("change").bind("change", function () {
                 //alert();
-                alert($(this).val());
+                //alert($(this).val());
 
                 var sOptionValues = $(this).val().split("-");
                 petId = parseInt(sOptionValues[0]);
@@ -226,7 +227,7 @@
 
             $.each(result, function (index, col) {
                 //alert(data[index]["petName"]);
-                table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td >/tr>");
+                table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td ><td><button class='btn btn-primary' onclick='fnPay(" + result[index]["consultId"] + ");'>Pay</button></td></tr>");
                 //table.append("<td>" + result[index]["consultDate"] + "</td > ");
                 //table.append("<td>" + result[index]["petName"] + "</td > ");
                 //table.append("<td>" + result[index]["medicalChart"] + "</td > ");
@@ -254,10 +255,13 @@
             table = $("#tableHistory");
 
             $.each(result, function (index, col) {
-                table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td ></tr>");
+                table.append("<tr><td>" + result[index]["consultDate"] + "</td ><td>" + result[index]["petName"] + "</td ><td>" + result[index]["medicalChart"] + "</td > <td><button class='btn btn-primary' onclick='fnPay(" + result[index]["consultId"] + ");'>Pay</button></td> </tr>");
             });
         }
 
+        function fnPay(consultId) {
+            document.location.href = "@Url.Content("~/Pay/Index/?id=")" + consultId;
+        }
 
     </script>
 }

@@ -16,6 +16,7 @@ namespace Vet.Data
         public DbSet<Pet> Pets { get; set; }
         public DbSet<Owner> Owners { get; set; }
         public DbSet<Consult> Consults { get; set; }
-
+        public DbSet<Pay> Pays { get; set; }
+        public DbSet<Quota> Quotas { get; set; } 
     }
 }

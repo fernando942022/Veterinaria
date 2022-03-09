@@ -22,6 +22,13 @@ namespace Vet.Controllers
             return View(Dbcon.Consults.ToList());
         }
 
+        //Buscamos una consulta especifica por medio de su id
+        [HttpPost]
+        public IActionResult Index(int consultId)
+        {
+            return Json(Dbcon.Consults.Where(c => c.ConsultId == consultId).ToList());
+        }
+
         public IActionResult Add()
         {
             return View();

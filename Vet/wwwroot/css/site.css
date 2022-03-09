@@ -91,3 +91,12 @@ body {
     border-radius: 15px;
     position: center;
 }
+
+#divrest, #divamaunt, #divtotal{
+    float: left;
+}
+
+#modalbtnSave{
+    clear: both;
+    display: block;
+}

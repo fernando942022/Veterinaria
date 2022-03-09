@@ -11,38 +11,32 @@ namespace Vet.Models
     {
         public int PayId { get; set; }
 
-        /*public int PetId { get; set; }
-        public Pet Pet { get; set; }
+        public int ConsultId { get; set; }
+        public Consult Consult { get; set; }
 
         [Required]
-        [StringLength(20)]
-        [Display(Name = "Owner name")]
-        public string OwnerName { get; set; }
-
-        [Required]
-        [StringLength(20)]
-        [Display(Name = "Pet name")]
-        public string PetName { get; set; }
-
-        [Required]
-        [Display(Name = "Consult date:   ")]
+        [Display(Name = "Payment date:   ")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime ConsultDate { get; set; }
+        public DateTime PaymentDate { get; set; }
 
         [Required]
-        [Display(Name = "Pet weight(Kgs)")]
-        public int PetWeight { get; set; }
+        [Display(Name = "Payment amount")]
+        public int PaymentAmount { get; set; }
 
         [Required]
         [StringLength(20)]
-        [Display(Name = "Body temperature")]
-        public string PetTemperature { get; set; }
+        [Display(Name = "Payment Type")]
+        public string PaymentType { get; set; }
 
         [Required]
-        //[StringLength(200)]
-        [AllowHtml]
-        [Display(Name = "Medical pet chart")]
-        public string MedicalChart { get; set; }*/
+        [StringLength(20)]
+        [Display(Name = "Fee Payment Count")]
+        public int FeePaymentCount { get; set; }
+
+        [Required]
+        [StringLength(20)]
+        [Display(Name = "Status")]
+        public string Status { get; set; }
     }
 }
