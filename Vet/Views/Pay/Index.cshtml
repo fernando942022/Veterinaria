@@ -9,7 +9,7 @@
 
     <div class="col-4 bg-primary text-white border rounded" >
         <h5 id="titlePayment"></h5>
-
+        <img src="~/images/pay.jpg" class="rounded"/>
     </div>
     <div class="col-8 border-top border-bottom border-right rounded">
         <br />
@@ -45,10 +45,14 @@
         <button class="btn btn-success" id="btnPay">Pay</button><br />
 
     </div>
-</div><br />
+</div><br /><br />
 
 <div id="feePayment">
-
+    <table class="table" id="tableQuota">
+        <tr>
+            <th>Quota Date</th><th>Amount</th><th>Rest</th><th>Total</th>
+        </tr>
+    </table>
 </div>
 
 <div class="container">
@@ -58,7 +62,7 @@
 
             <!-- Modal content-->
             <div class="modal-content">
-                <div class="modal-header" style="padding:35px 50px;" id="modalTitle">
+                <div class="modal-header bg-success text-white" style="padding:35px 50px;" id="modalTitle">
 
                     <button type="button" class="close" data-dismiss="modal" style="text-align:right">[X]</button>
                     <h5 id="modalTitle"></h5>
@@ -142,7 +146,34 @@
 
         $("#btnPay").click(function () {
             alert();
+            fngetdataPay();
 
         });
+
+        function fngetdataPay() {
+            if ($("input:radio[name=paymentType]:checked").val() == "Fee payment") {
+                data = {
+                    ConsultId: consultId,
+                    PaymentDate: $("#paymentdate").val(),
+                    PaymentAmount: $("#amount").val(),
+                    PaymentType: $("input:radio[name=paymentType]:checked").val(),
+                    FeePaymentCount: 0, //aqui debemos poner una variable contadora que aumente cada vez que se realiza una cuota // con este atributo nos damos cuenta cuantas cuotas realiza el cte.
+                    Status: "Pendent" //Cuando el cliente cancele la cantidad total a pagar, el atributo se cambiara a Payed
+                }
+            }
+            else if ( $("input:radio[name=paymentType]:checked").val() == "Cash" ) {
+                data = {
+                    ConsultId: consultId,
+                    PaymentDate: $("#paymentdate").val(),
+                    PaymentAmount: $("#amount").val(),
+                    PaymentType: $("input:radio[name=paymentType]:checked").val(),
+                    FeePaymentCount: 0, //Si el pago es al contado este atributo valdra 0.
+                    Status: "PendentPayed"
+                }
+            }
+            alert(data["PaymentType"]);
+            return data;
+        }
+
     </script>
 }
