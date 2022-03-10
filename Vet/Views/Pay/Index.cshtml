@@ -110,8 +110,9 @@
 {
     <script>
         var consultId;
+        var payId;
+        var existingPay = false;
         var payTitle;
-        var countQuota;
         var statusPay;
 
         $(document).ready(function () {
@@ -139,25 +140,8 @@
 
                 });
 
-            //Verificamos si la consulta tiene registro de pagos por cuota.
-            $.ajax({
-                url: "@Url.Action("Index", "Pay")",
-                data: { consultId },
-                type: "Post"
-                }).done(function (result) {
-                    // si el resultado de la consulta tiene registro se genera la lista
-                    if (result != "") {
-                        //alert(result[0]["petName"]);
-
-                    }
-                    else {
-                        //Si no hay registro es porque es un pago nuevo.
-                        countQuota = 0;
-                        statusPay = "Pending";
-
-                    }
-
-                });
+            //Verificamos si la consulta tiene registro de pagos.
+            fnverifyPay();
 
         });
 
@@ -169,33 +153,103 @@
         $("#btnPay").click(function () {
             //alert();
             if ($("input:radio[name=paymentType]:checked").val() == "Fee payment") {
+                statusPay = "Pending";
 
+                //Sino existe es porque es un pago nuevo que se hara la primera cuota
+                if (!existingPay) {
+                    fnPay();
+                    fnQuota();
+                }
+                else {
+                    fnQuota();
+                }
             }
 
             if ($("input:radio[name=paymentType]:checked").val() == "Cash") {
                 statusPay = "Payed";
-                $.ajax({
-                url: "@Url.Action("Add", "Pay")",
-                data: fngetdataPay(),
-                type: "Post"
-                }).done(function (result) {
-                    // si el resultado de la consulta tiene registro se genera la lista
-                    if (result != "") {
-                        //alert(result[0]["petName"]);
-
-                    }
-                    else {
-
-                    }
-
-                });
+                fnPay();
             }
 
         });
 
         $("#modalbtnSave").click(function () {
             fngetdataQuota()
+            alert();
         });
+
+        function fnverifyPay() {
+            $.ajax({
+                url: "@Url.Action("Index", "Pay")",
+                data: { consultId },
+                type: "Post"
+                }).done(function (result) {
+                    //
+                    if (result != "") {
+                        //alert(result[0]["petName"]);
+                        payId = result["payId"];
+                        existingPay = true;
+                        //alert(payId);
+                        $("#paymentdate").val() = result["paymentDate"];
+                        $("#amount").val() = result["amount"];
+                        $("#cash").attr("checked", true);
+
+                        if (result["status"] == "Pending") {
+                            $("#feepayment").attr("checked", true);
+
+                        }
+                        else {
+                            $("#btnPay").text("Payed");
+                            $("#btnPay").attr("disabled", true);
+                        }
+
+                    }
+                    else {
+                        //Si no hay registro es porque es un pago nuevo.
+                        statusPay = "Pending";
+
+                    }
+
+                });
+        }
+
+        function fnPay() {
+            $.ajax({
+                url: "@Url.Action("Add", "Pay")",
+                data: fngetdataPay(),
+                type: "Post"
+                }).done(function (result) {
+                    // si el resultado de la consulta tiene registro se genera la lista
+                    if (result != "") {
+                        alert(result);
+                        payId = result["payId"];
+                        //return result;
+                    }
+                    else {
+                        //return result;
+                    }
+
+                });
+        }
+
+        function fnQuota()
+        {
+            $.ajax({
+                url: "@Url.Action("Add", "Quota")",
+                data: fngetdataQuota(),
+                type: "Post"
+                }).done(function (result) {
+                    // si el resultado de la consulta tiene registro se genera la lista
+                    if (result != "") {
+                        alert(result);
+                        
+                        //return result;
+                    }
+                    else {
+                        //return result;
+                    }
+
+                });
+        }
 
         function fngetdataPay() {
             data = {
@@ -203,16 +257,16 @@
                 PaymentDate: $("#paymentdate").val(),
                 PaymentAmount: $("#amount").val(),
                 PaymentType: $("input:radio[name=paymentType]:checked").val(),
-                FeePaymentCount: countQuota, //aqui debemos poner una variable contadora que aumente cada vez que se realiza una cuota // con este atributo nos damos cuenta cuantas cuotas realiza el cte.
                 Status: statusPay //Cuando el cliente cancele la cantidad total a pagar, el atributo se cambiara a Payed
             }
 
-            alert(data["PaymentType"] + " <> " + data["Status"]);
+            //alert(data["PaymentType"] + " <> " + data["Status"]);
             return data;
         }
 
         function fngetdataQuota() {
             data = {
+                PayId: payId,
                 QuotaDate: $("#quotadate").val(),
                 Total: $("#total").val(),
                 PaymentAmount: $("#paymentamount").val(),
@@ -221,6 +275,7 @@
             //alert(data["Total"] + " <> " + data["QuotaDate"]);
             return data;
         }
+
 
     </script>
 }

@@ -31,11 +31,6 @@ namespace Vet.Models
 
         [Required]
         [StringLength(20)]
-        [Display(Name = "Fee Payment Count")]
-        public int FeePaymentCount { get; set; }
-
-        [Required]
-        [StringLength(20)]
         [Display(Name = "Status")]
         public string Status { get; set; }
     }

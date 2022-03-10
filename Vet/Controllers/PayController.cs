@@ -38,7 +38,7 @@ namespace Vet.Controllers
 
             Dbcon.Pays.Add(model);
             Dbcon.SaveChanges();
-            return Json(1);
+            return Json(Dbcon.Pays.Where(p => p.PaymentDate == model.PaymentDate));
         }
     }
 }
