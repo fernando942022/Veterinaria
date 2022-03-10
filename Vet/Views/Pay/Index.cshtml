@@ -87,18 +87,18 @@
                     <div class="form-group col-lg-3" id="divamaunt">
                         <label class="control-label">Amount</label>
                         <div>
-                            <input type="number" class="form-control" id="amount" />
+                            <input type="number" class="form-control" id="quota" />
                         </div>
                     </div>
 
                     <div class="form-group col-lg-3" id="divrest">
                         <label class="control-label">Rest</label>
                         <div>
-                            <input type="number" class="form-control" id="rest" disabled/>
+                            <input type="number" class="form-control" id="rest" />
                         </div>
                     </div>
 
-                    <br /><button type="button" class="btn btn-primary" data-dismiss="modal" style="text-align:right" id="modalbtnSave">Save</button>
+                    <br /><button type="button" class="btn btn-primary" data-dismiss="modal" style="text-align:right" id="modalbtnSave">Close</button>
                 </div>
 
             </div>
@@ -146,14 +146,17 @@
         });
 
         $("#feepayment").click(function () {
+            $("#quotadate").attr("value", $("#paymentdate").val());
+            $("#total").attr("value", $("#amount").val());
             $("#quotaModal").modal({ backdrop: false });
             $("#modalTitle").text(payTitle);
+
         });
 
         $("#btnPay").click(function () {
             //alert();
             if ($("input:radio[name=paymentType]:checked").val() == "Fee payment") {
-                statusPay = "Pending";
+                //statusPay = "Pending";
 
                 //Sino existe es porque es un pago nuevo que se hara la primera cuota
                 if (!existingPay) {
@@ -173,8 +176,8 @@
         });
 
         $("#modalbtnSave").click(function () {
-            fngetdataQuota()
-            alert();
+            //fngetdataQuota()
+            //alert();
         });
 
         function fnverifyPay() {
@@ -185,16 +188,21 @@
                 }).done(function (result) {
                     //
                     if (result != "") {
-                        //alert(result[0]["petName"]);
-                        payId = result["payId"];
+                        //alert(result[0]["paymentAmount"]);
+                        payId = result[0]["payId"];
                         existingPay = true;
                         //alert(payId);
-                        $("#paymentdate").val() = result["paymentDate"];
-                        $("#amount").val() = result["amount"];
-                        $("#cash").attr("checked", true);
-
-                        if (result["status"] == "Pending") {
+                        $("#paymentdate").attr("value", result[0]["paymentDate"]);
+                        $("#amount").attr("value", result[0]["paymentAmount"]);
+                        if (result[0]["paymentType"] == "Cash") {
+                            $("#cash").attr("checked", true);
+                        }
+                        else {
                             $("#feepayment").attr("checked", true);
+                        }
+
+                        if (result[0]["status"] == "Pending") {
+
                             //Verificamos si el pago tiene cuotas
                             $.ajax({
                                 url: "@Url.Action("ListQuota", "Quota")",
@@ -203,18 +211,19 @@
                             }).done(function (result) {
                                  // si el resultado de la consulta tiene registro se genera la lista
                                 if (result != "") {
-                                    alert(result);
+                                    //alert(result);
                                     $.each(result, function (index, row) {
-                                        $("#tableQuota").append("<tr><td>" + result[index]["quotaDate"] + "</td><td>" + result[index]["amount"] + "</td><td>" + result[index]["rest"] + "</td><td>" + result[index]["total"] + "</td></tr>");
-                                    });                                    
+                                        $("#tableQuota").append("<tr><td>" + result[index]["quotaDate"] + "</td><td>" + result[index]["paymentAmount"] + "</td><td>" + result[index]["rest"] + "</td><td>" + result[index]["total"] + "</td></tr>");
+                                    });
                                 }
-                                
+
                             });
 
                         }
                         else {
                             $("#btnPay").text("Payed");
                             $("#btnPay").attr("disabled", true);
+                            $("#feepayment").attr("disabled", true);
                         }
 
                     }
@@ -235,8 +244,8 @@
                 }).done(function (result) {
                     // si el resultado de la consulta tiene registro se genera la lista
                     if (result != "") {
-                        alert(result);
-                        payId = result["payId"];
+                        alert("pagando pay");
+                        payId = result[0]["payId"];
                         //return result;
                     }
                     else {
@@ -255,15 +264,24 @@
                 }).done(function (result) {
                     // si el resultado de la consulta tiene registro se genera la lista
                     if (result != "") {
-                        alert(result);
+                        //Si el valor de rest es 0 editamos el atributo status de la tabla Pay y lo dejamos Payed
+                        if ($("#rest").val() == 0) {
+                            //alert("Restante cero");
+                            $.ajax({
+                                url: "@Url.Action("EditStatus", "Pay")",
+                                data: { payId },
+                                type: "Post"
+                            }).done(function (info) {
+                                // si el resultado de la consulta tiene registro se genera la lista
+                            });
 
-                        //return result;
+                        }
                     }
                     else {
                         //return result;
                     }
-
                 });
+
         }
 
         function fngetdataPay() {
@@ -280,14 +298,15 @@
         }
 
         function fngetdataQuota() {
+            alert(payId);
             data = {
                 PayId: payId,
                 QuotaDate: $("#quotadate").val(),
                 Total: $("#total").val(),
-                PaymentAmount: $("#paymentamount").val(),
+                PaymentAmount: $("#quota").val(),
                 Rest: $("#rest").val()
             }
-            //alert(data["Total"] + " <> " + data["QuotaDate"]);
+
             return data;
         }
 

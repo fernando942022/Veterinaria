@@ -40,5 +40,15 @@ namespace Vet.Controllers
             Dbcon.SaveChanges();
             return Json(Dbcon.Pays.Where(p => p.PaymentDate == model.PaymentDate));
         }
+
+        [HttpPost]
+        public IActionResult EditStatus(int payId)
+        {
+            Pay oPay = Dbcon.Pays.Find(payId);
+            oPay.Status = "Payed";
+            Dbcon.Entry(oPay).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            Dbcon.SaveChanges();
+            return Json(1);
+        }
     }
 }

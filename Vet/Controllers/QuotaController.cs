@@ -25,6 +25,11 @@ namespace Vet.Controllers
         [HttpPost]
         public IActionResult Add(Quota model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
             Dbcon.Quotas.Add(model);
             Dbcon.SaveChanges();
 
@@ -36,5 +41,6 @@ namespace Vet.Controllers
         {
             return Json(Dbcon.Quotas.Where(q => q.PayId == payId).ToList());
         }
+
     }
 }
