@@ -195,6 +195,21 @@
 
                         if (result["status"] == "Pending") {
                             $("#feepayment").attr("checked", true);
+                            //Verificamos si el pago tiene cuotas
+                            $.ajax({
+                                url: "@Url.Action("ListQuota", "Quota")",
+                                data: { payId },
+                                type: "Post"
+                            }).done(function (result) {
+                                 // si el resultado de la consulta tiene registro se genera la lista
+                                if (result != "") {
+                                    alert(result);
+                                    $.each(result, function (index, row) {
+                                        $("#tableQuota").append("<tr><td>" + result[index]["quotaDate"] + "</td><td>" + result[index]["amount"] + "</td><td>" + result[index]["rest"] + "</td><td>" + result[index]["total"] + "</td></tr>");
+                                    });                                    
+                                }
+                                
+                            });
 
                         }
                         else {
@@ -241,7 +256,7 @@
                     // si el resultado de la consulta tiene registro se genera la lista
                     if (result != "") {
                         alert(result);
-                        
+
                         //return result;
                     }
                     else {
