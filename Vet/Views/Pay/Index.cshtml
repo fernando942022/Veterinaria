@@ -11,20 +11,20 @@
         <h5 id="titlePayment"></h5>
         <img src="~/images/pay.jpg" class="rounded"/>
     </div>
-    <div class="col-8 border-top border-bottom border-right rounded">
+    <div class="col-8 border-top border-bottom border-right rounded" id="divPay">
         <br />
 
         <div class="form-group">
             <label class="control-label">Payment Date</label>
             <div class="col-lg-9">
-                <input type="datetime-local" class="form-control" id="paymentdate"/>
+                <input type="datetime-local" class="form-control" id="paymentdate" />
             </div>
         </div>
 
         <div class="form-group">
             <label class="control-label">Total</label>
             <div class="col-lg-9">
-                <input type="number" class="form-control" id="amount"/>
+                <input type="number" class="form-control" id="amount" />
             </div>
         </div>
 
@@ -94,7 +94,7 @@
                     <div class="form-group col-lg-3" id="divrest">
                         <label class="control-label">Rest</label>
                         <div>
-                            <input type="number" class="form-control" id="rest" />
+                            <input type="number" class="form-control" id="rest" disabled/>
                         </div>
                     </div>
 
@@ -114,11 +114,13 @@
         var existingPay = false;
         var payTitle;
         var statusPay;
+        var rest = 0;
+        var quota = 0;
 
         $(document).ready(function () {
             var dirUrl = $(location).attr('search').split("=");
             consultId = parseInt(dirUrl[1]);
-            alert(consultId);
+            //alert(consultId);
 
             //Realizamos un ajax para obtener los datos de la consulta cuyo id viene en la url. Despues extraemos dichos datos para generar el rotulo del pago.
             $.ajax({
@@ -148,23 +150,29 @@
         $("#feepayment").click(function () {
             $("#quotadate").attr("value", $("#paymentdate").val());
             $("#total").attr("value", $("#amount").val());
+            $("#rest").attr("value", rest);
             $("#quotaModal").modal({ backdrop: false });
             $("#modalTitle").text(payTitle);
 
+            $("#quota").blur(function () {
+                alert(quota);
+                $("#rest").attr("value", parseInt($("#total").val()) - quota - parseInt($("#quota").val()));
+            });
         });
 
         $("#btnPay").click(function () {
             //alert();
             if ($("input:radio[name=paymentType]:checked").val() == "Fee payment") {
                 //statusPay = "Pending";
-
-                //Sino existe es porque es un pago nuevo que se hara la primera cuota
+                //Si no existe es porque es un pago nuevo al que se hara la primera cuota
                 if (!existingPay) {
                     fnPay();
-                    fnQuota();
+                    //fnQuota();
                 }
+
                 else {
                     fnQuota();
+
                 }
             }
 
@@ -172,12 +180,13 @@
                 statusPay = "Payed";
                 fnPay();
             }
-
+            document.location.href = "@Url.Content("~/Consult/Index")";
         });
 
         $("#modalbtnSave").click(function () {
             //fngetdataQuota()
             //alert();
+            $("#tableQuota").append("<tr><td>" + $("#quotadate").val() + "</td><td>" + $("#quota").val() + "</td><td>" + $("#rest").val() + "</td><td>" + $("#total").val() + "</td></tr>");
         });
 
         function fnverifyPay() {
@@ -213,6 +222,9 @@
                                 if (result != "") {
                                     //alert(result);
                                     $.each(result, function (index, row) {
+                                        rest = result[index]["rest"];
+                                        quota += result[index]["paymentAmount"];
+
                                         $("#tableQuota").append("<tr><td>" + result[index]["quotaDate"] + "</td><td>" + result[index]["paymentAmount"] + "</td><td>" + result[index]["rest"] + "</td><td>" + result[index]["total"] + "</td></tr>");
                                     });
                                 }
@@ -224,6 +236,7 @@
                             $("#btnPay").text("Payed");
                             $("#btnPay").attr("disabled", true);
                             $("#feepayment").attr("disabled", true);
+                            $("#divPay").append("<a class='text-primary float-right' onclick='fnDetails(" + consultId + "," + payId + ")'>Show Details </>");
                         }
 
                     }
@@ -237,6 +250,7 @@
         }
 
         function fnPay() {
+            var p_id;
             $.ajax({
                 url: "@Url.Action("Add", "Pay")",
                 data: fngetdataPay(),
@@ -244,25 +258,56 @@
                 }).done(function (result) {
                     // si el resultado de la consulta tiene registro se genera la lista
                     if (result != "") {
-                        alert("pagando pay");
-                        payId = result[0]["payId"];
-                        //return result;
+                        console.info(result);
+                        payId = result["payId"];
+                        //alert("pagando pay <> " + payId);
+                        //fnQuota();
+
+                        alert("FnQuota PayId: " + payId);
+                        $.ajax({
+                            url: "@Url.Action("Add", "Quota")",
+                            data: fngetdataQuota(),
+                            type: "Post"
+                            }).done(function (result) {
+                            //
+                            if (result != "") {
+                            //Si el valor de rest es 0 editamos el atributo status de la tabla Pay y lo dejamos Payed
+                            if ($("#rest").val() == 0) {
+                                //alert("Restante cero");
+                                $.ajax({
+                                    url: "@Url.Action("EditStatus", "Pay")",
+                                    data: { payId },
+                                    type: "Post"
+                                }).done(function (info) {
+                                //
+                                });
+
+                            }
                     }
                     else {
                         //return result;
                     }
+                });
+
+                    }
+                    else {
+                        //return result;
+                        alert("Error to pay");
+                    }
 
                 });
+
         }
 
         function fnQuota()
         {
+            alert("FnQuota PayId: " + payId);
             $.ajax({
                 url: "@Url.Action("Add", "Quota")",
                 data: fngetdataQuota(),
                 type: "Post"
                 }).done(function (result) {
-                    // si el resultado de la consulta tiene registro se genera la lista
+                    //
                     if (result != "") {
                         //Si el valor de rest es 0 editamos el atributo status de la tabla Pay y lo dejamos Payed
                         if ($("#rest").val() == 0) {
@@ -272,7 +317,7 @@
                                 data: { payId },
                                 type: "Post"
                             }).done(function (info) {
-                                // si el resultado de la consulta tiene registro se genera la lista
+                                //
                             });
 
                         }
@@ -298,7 +343,7 @@
         }
 
         function fngetdataQuota() {
-            alert(payId);
+            //alert(payId);
             data = {
                 PayId: payId,
                 QuotaDate: $("#quotadate").val(),
@@ -310,6 +355,10 @@
             return data;
         }
 
+        function fnDetails(c_Id, p_Id) {
+            alert(c_Id + " <> " + p_Id);
+            document.location.href = "@Url.Content("~/Pay/Details/?id=")" + c_Id + "=" + p_Id;
+        }
 
     </script>
 }

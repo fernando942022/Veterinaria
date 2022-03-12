@@ -38,7 +38,8 @@ namespace Vet.Controllers
 
             Dbcon.Pays.Add(model);
             Dbcon.SaveChanges();
-            return Json(Dbcon.Pays.Where(p => p.PaymentDate == model.PaymentDate));
+            //Dbcon.Pays.Where(p => p.PaymentDate == model.PaymentDate).ToList()
+            return Json(Dbcon.Pays.OrderByDescending(p => p.PaymentDate).First());
         }
 
         [HttpPost]
@@ -49,6 +50,11 @@ namespace Vet.Controllers
             Dbcon.Entry(oPay).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             Dbcon.SaveChanges();
             return Json(1);
+        }
+
+        public IActionResult Details()
+        {
+            return View();
         }
     }
 }

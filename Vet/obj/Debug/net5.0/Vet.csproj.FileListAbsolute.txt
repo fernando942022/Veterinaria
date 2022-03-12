@@ -445,3 +445,4 @@ C:\Users\FFernandez\source\repos\Vet\Vet\bin\Debug\net5.0\zh-Hant\Microsoft.Code
 C:\Users\FFernandez\source\repos\Vet\Vet\obj\Debug\net5.0\Razor\Views\Consult\Add.cshtml.g.cs
 C:\Users\FFernandez\source\repos\Vet\Vet\obj\Debug\net5.0\Razor\Views\Consult\NewConsult.cshtml.g.cs
 C:\Users\FFernandez\source\repos\Vet\Vet\obj\Debug\net5.0\Razor\Views\Pay\Index.cshtml.g.cs
+C:\Users\FFernandez\source\repos\Vet\Vet\obj\Debug\net5.0\Razor\Views\Pay\Details.cshtml.g.cs

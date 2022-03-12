@@ -1,0 +1,93 @@
+﻿<div class="col-12">
+    <p class="text-center">
+        <b>Lucas Vet</b><br />Fundeci tercera etapa, 22458796, lucas.vet@@gmail.com<br /><br /><b>Payment Detail!!</b>
+    </p>
+</div><br />
+
+<div class="col-4 float-left">
+<dl>
+    <dt id="titlePay"></dt>
+    <dt >Owner</dt>
+        <dd id="owner"></dd>
+    <dt>Pet</dt>
+        <dd id="pet"></dd>
+</dl>
+</div>
+
+<div class="col-8 float-right" id="detailPay">
+    <table class="table" id="tablePay">
+    </table><br />
+
+    <table class="table" id="tableQuota">
+    </table>
+</div>
+
+@section scripts
+{ 
+    <script>
+        var consulId, payId;
+        var medicalChart;
+        $(document).ready(function () {
+            var dirUrl = $(location).attr('search').split("=");
+            consultId = parseInt(dirUrl[1]);
+            payId = parseInt(dirUrl[2]);;
+
+            //Realizamos un ajax para obtener los datos de la consulta cuyo id viene en la url.
+            $.ajax({
+                url: "@Url.Action("Index", "Consult")",
+                data: { consultId },
+                type: "Post"
+                }).done(function (result) {
+                    // si el resultado de la consulta tiene registro se genera la lista
+                    if (result != "") {
+                        alert(result[0]["petName"]);
+                        payTitle = "Vet-" + result[0]["petName"] + "-" + consultId + "-" + result[0]["ownerName"];
+                        $("#titlePay").text(payTitle);
+
+                        $("#owner").text(" - " + result[0]["ownerName"]);
+                        $("#pet").text(" - " + result[0]["petName"]);
+                        medicalChart = result[0]["medicalChart"];
+
+                    }
+                    else {
+                        alert("Error. Fail");
+
+                    }
+
+                });
+            //Obtenemos los datos del pago
+            $.ajax({
+                url: "@Url.Action("Index", "Pay")",
+                data: { consultId },
+                type: "Post"
+            }).done(function (result) {
+                if (result[0]["paymentType"] == "Cash") {
+                    $("#tablePay").append("<tr><td>Payment Date: </td><td>" + result[0]["paymentDate"] + "</td></tr><tr><td>Payment Type: </td><td>" + result[0]["paymentType"] + "</td></tr><tr><td>Payment Amount: </td><td>" + result[0]["paymentAmount"] + "</td></tr><tr><th>Total: </th><th>" + result[0]["paymentAmount"] + "</th></tr>");
+                }
+                
+                if (result[0]["paymentType"] == "Fee payment") {
+                    var tableQuota = $("#tableQuota");
+                    $.ajax({
+                        url: "@Url.Action("ListQuota", "Quota")",
+                        data: { payId },
+                        type: "Post"
+                    }).done(function (dataQuota) {
+                        if (dataQuota != "") {
+                            $("#tablePay").append("<tr><td>Payment Type: </td><td>" + result[0]["paymentType"] + "</td></tr><tr class='thead-dark'><td>Status Pay: </td><td>" + result[0]["status"] + "</td></tr>");
+
+                            tableQuota.append("<tr><th>Quota Details</th></tr><tr><th>Quota Date</th><th>Payment Amount</th></tr>");
+                            $.each(dataQuota, function (index, valQuota) {
+                                tableQuota.append("<tr><td>" + dataQuota[index]["quotaDate"] + "</td><td>" + dataQuota[index]["paymentAmount"] + "</td></tr>");
+                            });
+                            tableQuota.append("<tr><th>Total</th><th>" + dataQuota[0]["total"] + "</th></tr>");
+                        }
+
+                    });
+
+                }
+            });
+
+        });
+
+    </script>
+}
