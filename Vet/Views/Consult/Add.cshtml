@@ -63,7 +63,7 @@
         //EStas variables las usaremos cuando vayamos a crear una consulta nueva a partir de la lista de consultas y no de la lsita de mascotas
         var petId1;
 
-        $("#consultdate").val("03/08/2022");
+        //$("#consultdate").val("03/08/2022");
         $(document).ready(function () {
 
             //Si el segundo valor de la url es new es porque proviene de la lista de consultas y no de mascotas.
@@ -72,7 +72,7 @@
                 $("#headerH3").text("New Consult");
                 $("#petname").remove();
                 $("#divPetname").append("<select id='selectPets' class='form-control col-12'><option>Pet Name</option></option></select>");
-                alert($("#selectPets").val());
+                //alert($("#selectPets").val());
 
                 //este dato no se utiliza, solamente se envia como parametro de ajax
                 var datatest = 1;
@@ -166,7 +166,7 @@
                             CreateRow(result);
                             //console.info($("#tableHistory").length);
                         }
-
+                        document.location.href = "@Url.Content("~/Consult/Index")";
                     }
                     else {
                         alert("Erro to save consult");
@@ -238,7 +238,6 @@
         }
 
         function dataConsult() {
-            //alert(namePet);
             data = {
                 PetId: petId,
                 OwnerName: $("#ownername").val(),

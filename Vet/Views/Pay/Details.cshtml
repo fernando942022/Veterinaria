@@ -40,7 +40,7 @@
                 }).done(function (result) {
                     // si el resultado de la consulta tiene registro se genera la lista
                     if (result != "") {
-                        alert(result[0]["petName"]);
+                        //alert(result[0]["petName"]);
                         payTitle = "Vet-" + result[0]["petName"] + "-" + consultId + "-" + result[0]["ownerName"];
                         $("#titlePay").text(payTitle);
 
@@ -61,7 +61,7 @@
                 data: { consultId },
                 type: "Post"
             }).done(function (result) {
-                if (result[0]["paymentType"] == "Cash") {
+                if (result[0]["paymentType"] == "Counted") {
                     $("#tablePay").append("<tr><td>Payment Date: </td><td>" + result[0]["paymentDate"] + "</td></tr><tr><td>Payment Type: </td><td>" + result[0]["paymentType"] + "</td></tr><tr><td>Payment Amount: </td><td>" + result[0]["paymentAmount"] + "</td></tr><tr><th>Total: </th><th>" + result[0]["paymentAmount"] + "</th></tr>");
                 }
                 

@@ -1,34 +1,40 @@
 ﻿@model List<Vet.Models.Consult>
 
-<h3>Consults.</h3><br />
+    <h3>Consults.</h3>
+    <br />
 
-<button class="btn btn-primary" id="newConsult" onclick="document.location.href = '@Url.Content("~/Consult/Add/?id=0=new")'" >+ Create New Consult</button><br /><br />
+    <button class="btn btn-primary" id="newConsult" onclick="document.location.href = '@Url.Content("~/Consult/Add/?id=0=new")'">+ Create New Consult</button>
+    <br />
+    <br />
 
-<table class="table" id="tableConsult">
-    <thead>
-        <tr>
-            <th>Owner Name</th>
-            <th>Pet NAme</th>
-            <th>Consult Date</th>
-            <th>Pet Weight</th>
-            <th>Temperature</th>
-            <th>Medical Chart</th>
-        </tr>
-    </thead>
-    @foreach(var columnData in Model)
-    {
-        <tbody>
+    <table class="table" id="tableConsult">
+        <thead>
             <tr>
-                <td>@columnData.OwnerName</td>
-                <td>@columnData.PetName</td>
-                <td>@columnData.ConsultDate</td>
-                <td>@columnData.PetWeight</td>
-                <td>@columnData.PetTemperature</td>
-                <td>@columnData.MedicalChart</td>
-                <td><button class="btn btn-primary" onclick="document.location.href = '@Url.Content("~/Pay/Index/?id="+columnData.ConsultId)'">Pay</button></td>
+                <th>Owner Name</th>
+                <th>Pet NAme</th>
+                <th>Consult Date</th>
+                <th>Pet Weight</th>
+                <th>Temperature</th>
+                <th>Medical Chart</th>
             </tr>
-        </tbody>
-    }
-</table>
-<br />
-<br />
+        </thead>
+        @foreach (var columnData in Model)
+        {
+            var medicalC = columnData.MedicalChart;
+            <tbody>
+                <tr>
+                    <td>@columnData.OwnerName</td>
+                    <td>@columnData.PetName</td>
+                    <td>@columnData.ConsultDate</td>
+                    <td>@columnData.PetWeight</td>
+                    <td>@columnData.PetTemperature</td>
+                    <td>@Html.Raw(columnData.MedicalChart)</td>
+                    <td><button class="btn btn-primary" onclick="document.location.href = '@Url.Content("~/Pay/Index/?id="+columnData.ConsultId)'">Pay</button></td>
+                </tr>
+            </tbody>
+        }
+    </table>
+    <br />
+    <br />
+
+

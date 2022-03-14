@@ -30,9 +30,9 @@
 
         <div class="form-group">
             <label>Payment Type:</label><br />
-            <input class="form-check-input" type="radio" name="paymentType" id="cash" value="Cash" checked, required="required" style="margin-left:10px;">
+            <input class="form-check-input" type="radio" name="paymentType" id="counted" value="Counted" checked, required="required" style="margin-left:10px;">
             <label class="form-check-label" for="gridRadios1" style="margin-left:30px;">
-                Cash
+                Counted
             </label>
             <br />
 
@@ -155,7 +155,7 @@
             $("#modalTitle").text(payTitle);
 
             $("#quota").blur(function () {
-                alert(quota);
+                //alert(quota);
                 $("#rest").attr("value", parseInt($("#total").val()) - quota - parseInt($("#quota").val()));
             });
         });
@@ -163,7 +163,6 @@
         $("#btnPay").click(function () {
             //alert();
             if ($("input:radio[name=paymentType]:checked").val() == "Fee payment") {
-                //statusPay = "Pending";
                 //Si no existe es porque es un pago nuevo al que se hara la primera cuota
                 if (!existingPay) {
                     fnPay();
@@ -176,7 +175,7 @@
                 }
             }
 
-            if ($("input:radio[name=paymentType]:checked").val() == "Cash") {
+            if ($("input:radio[name=paymentType]:checked").val() == "Counted") {
                 statusPay = "Payed";
                 fnPay();
             }
@@ -203,8 +202,8 @@
                         //alert(payId);
                         $("#paymentdate").attr("value", result[0]["paymentDate"]);
                         $("#amount").attr("value", result[0]["paymentAmount"]);
-                        if (result[0]["paymentType"] == "Cash") {
-                            $("#cash").attr("checked", true);
+                        if (result[0]["paymentType"] == "Counted") {
+                            $("#counted").attr("checked", true);
                         }
                         else {
                             $("#feepayment").attr("checked", true);
@@ -263,7 +262,7 @@
                         //alert("pagando pay <> " + payId);
                         //fnQuota();
 
-                        alert("FnQuota PayId: " + payId);
+                        //alert("FnQuota PayId: " + payId);
                         $.ajax({
                             url: "@Url.Action("Add", "Quota")",
                             data: fngetdataQuota(),
@@ -356,7 +355,7 @@
         }
 
         function fnDetails(c_Id, p_Id) {
-            alert(c_Id + " <> " + p_Id);
+            //alert(c_Id + " <> " + p_Id);
             document.location.href = "@Url.Content("~/Pay/Details/?id=")" + c_Id + "=" + p_Id;
         }
 
