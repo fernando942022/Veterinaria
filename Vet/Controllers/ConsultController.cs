@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Vet.Models;
 using Vet.Data;
+using PagedList;
+using PagedList.Mvc;
+using System.Web;
 
 namespace Vet.Controllers
 {
@@ -17,9 +20,14 @@ namespace Vet.Controllers
             Dbcon = con;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int? pageSize, int? page)
         {
-            return View(Dbcon.Consults.ToList());
+            //Se inicializan los valores de las variables en caso de que sean nulas
+            pageSize = (pageSize ?? 5);
+            page = (page ?? 1);
+            ViewBag.PageSize = pageSize;
+
+            return View(Dbcon.Consults.ToPagedList(page.Value, pageSize.Value));
         }
 
         //Buscamos una consulta especifica por medio de su id

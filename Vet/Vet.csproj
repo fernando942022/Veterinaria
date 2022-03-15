@@ -16,8 +16,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGenerators.Mvc" Version="5.0.0" />
+    <PackageReference Include="PagedList" Version="1.17.0" />
+    <PackageReference Include="PagedList.Mvc" Version="4.5.0" />
     <PackageReference Include="System.Web.Mvc.ExtendedModelBinder" Version="1.0.0" />
-    <PackageReference Include="TinyMCE.MVC.JQuery" Version="3.4.7" />
   </ItemGroup>
 
   <ItemGroup>

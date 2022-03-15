@@ -1,40 +1,49 @@
-﻿@model List<Vet.Models.Consult>
+﻿@using PagedList.Mvc;
+@using PagedList;
 
-    <h3>Consults.</h3>
-    <br />
+@model PagedList.IPagedList<Vet.Models.Consult>
 
-    <button class="btn btn-primary" id="newConsult" onclick="document.location.href = '@Url.Content("~/Consult/Add/?id=0=new")'">+ Create New Consult</button>
-    <br />
-    <br />
 
-    <table class="table" id="tableConsult">
-        <thead>
+<h3>Consults.</h3>
+<br />
+
+<button class="btn btn-primary" id="newConsult" onclick="document.location.href = '@Url.Content("~/Consult/Add/?id=0=new")'">+ Create New Consult</button>
+<br />
+<br />
+
+<table class="table" id="tableConsult">
+    <thead>
+        <tr>
+            <th>Owner Name</th>
+            <th>Pet NAme</th>
+            <th>Consult Date</th>
+            <th>Pet Weight</th>
+            <th>Temperature</th>
+            <th>Medical Chart</th>
+        </tr>
+    </thead>
+    @foreach (var columnData in Model)
+    {
+        var medicalC = columnData.MedicalChart;
+        <tbody>
             <tr>
-                <th>Owner Name</th>
-                <th>Pet NAme</th>
-                <th>Consult Date</th>
-                <th>Pet Weight</th>
-                <th>Temperature</th>
-                <th>Medical Chart</th>
+                <td>@columnData.OwnerName</td>
+                <td>@columnData.PetName</td>
+                <td>@columnData.ConsultDate</td>
+                <td>@columnData.PetWeight</td>
+                <td>@columnData.PetTemperature</td>
+                <td>@Html.Raw(columnData.MedicalChart)</td>
+                <td><button class="btn btn-primary" onclick="document.location.href = '@Url.Content("~/Pay/Index/?id="+columnData.ConsultId)'">Pay</button></td>
             </tr>
-        </thead>
-        @foreach (var columnData in Model)
-        {
-            var medicalC = columnData.MedicalChart;
-            <tbody>
-                <tr>
-                    <td>@columnData.OwnerName</td>
-                    <td>@columnData.PetName</td>
-                    <td>@columnData.ConsultDate</td>
-                    <td>@columnData.PetWeight</td>
-                    <td>@columnData.PetTemperature</td>
-                    <td>@Html.Raw(columnData.MedicalChart)</td>
-                    <td><button class="btn btn-primary" onclick="document.location.href = '@Url.Content("~/Pay/Index/?id="+columnData.ConsultId)'">Pay</button></td>
-                </tr>
-            </tbody>
-        }
-    </table>
-    <br />
-    <br />
+        </tbody>
+    }
+</table>
+<br />
+<br />
 
+Page @( Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber ) of @Model.PageCount
+<br />
 
+Total Item Count: @Model.TotalItemCount
+
+@@Html.PagedListPager(Model, page => Url.Action("Index", "Consult", new { page, pageSize = ViewBag.PageSIze }))
